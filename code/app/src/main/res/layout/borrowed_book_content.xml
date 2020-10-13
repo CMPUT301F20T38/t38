@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:layout_margin="8dp"
+        android:src="@mipmap/ic_launcher"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/borrowed_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="title"/>
+        <TextView
+            android:id="@+id/borrowed_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="author"
+            android:layout_marginTop="7dp"/>
+        <TextView
+            android:id="@+id/borrowed_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="status"
+            android:layout_marginTop="7dp"/>
+        <TextView
+            android:id="@+id/borrowed_owner_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="owner username"
+            android:layout_marginTop="7dp"/>
+        <Button
+            android:id="@+id/accept_borrowed_book"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:textSize="10dp"
+            android:text="ACCEPT BOOK"
+            android:background="#6666FF"
+            android:gravity="center"
+            android:layout_gravity="right"/>
+        <Button
+            android:id="@+id/return_borrowed_book"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:textSize="10dp"
+            android:text="RETURN BOOK"
+            android:background="#ff5555"
+            android:gravity="center"
+            android:layout_gravity="right"
+            android:visibility="gone"/>
+    </LinearLayout>
+</LinearLayout>
