@@ -9,22 +9,35 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
     <TextView
+        android:id="@+id/borrowed_return"
         android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="40dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_margin="5dp"
+        android:text="\u003C"/>
+    <TextView
+        android:layout_weight="10"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="20dp"
         android:layout_margin="5dp"
+        android:gravity="center"
+        android:layout_gravity="center"
         android:text="Books You Borrowed"/>
     <ImageView
+        android:id="@+id/borrowed_filter"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/filter"
         android:layout_marginRight="5dp"
-        android:layout_gravity="right"/>
+        android:layout_gravity="right|center"/>
 </LinearLayout>
 
     <ListView
-        android:id="@+id/city_list"
+        android:id="@+id/borrowed_list"
         android:layout_weight="10"
         android:layout_width="match_parent"
         android:layout_height="0dp">
