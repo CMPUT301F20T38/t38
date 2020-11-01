@@ -2,8 +2,7 @@ package com.example.booker;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,43 +31,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+        BottomNavigationView navView = findViewById(R.id.navigation_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                R.id.navigation_borrow, R.id.navigation_lend, R.id.navigation_profile)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavController navController = Navigation.findNavController(this, R.id.navigation_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-
-        db = FirebaseFirestore. getInstance ();
-        final CollectionReference collectionReference = db.collection("Users");
-        data.put("Province Name","123");
-        collectionReference
-                .document("aaa")
-                .set(data)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-// These are a method which gets executed when the task is succeeded
-                        Log. d ("TAG", "Data has been added successfully!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-// These are a method which gets executed if there’s any problem
-                        Log. d ("TAG", "Data could not be added!" + e.toString());
-                    }
-                });
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-                    FirebaseFirestoreException error) {
-            }
-        });
     }
 
 
