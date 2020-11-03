@@ -17,8 +17,6 @@ import com.example.booker.activities.UserSignUp;
 
 public class BorrowFragment extends Fragment {
 
-    private Button btnLogin;
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle saveInstanceState) {
         View root = inflater.inflate(R.layout.fragment_borrow, container, false);
