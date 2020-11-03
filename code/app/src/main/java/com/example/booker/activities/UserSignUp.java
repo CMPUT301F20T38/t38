@@ -1,6 +1,6 @@
 package com.example.booker.activities;
 
-import android.media.MediaPlayer;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,12 +12,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.booker.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-public class UserLogin extends AppCompatActivity {
+import java.util.HashMap;
+
+public class UserSignUp extends AppCompatActivity {
 
     private EditText userName;
     private EditText userEmail;
@@ -25,11 +31,12 @@ public class UserLogin extends AppCompatActivity {
     private Button btnSubmit;
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_sign_up);
 
         userName = (EditText) findViewById(R.id.login_username);
         userEmail = (EditText) findViewById(R.id.login_email);
@@ -38,6 +45,7 @@ public class UserLogin extends AppCompatActivity {
         btnSubmit = (Button) findViewById(R.id.login_submit);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,7 +56,8 @@ public class UserLogin extends AppCompatActivity {
     }
 
     private void login() {
-        String name = userName.getText().toString();
+        final Intent intent = getIntent();
+        final String name = userName.getText().toString();
         String email = userEmail.getText().toString();
         String password = userPassword.getText().toString();
 
@@ -72,14 +81,39 @@ public class UserLogin extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
                     FirebaseUser user = mAuth.getCurrentUser();
-                    Toast.makeText(getApplicationContext(), "Good", Toast.LENGTH_LONG).show();
+                    HashMap<String, String> data = new HashMap<>();
+
+                    CollectionReference collectionReference = db.collection("Users");
+                    data.put("Name", name);
+                    String Id = user.getUid();
+
+                    collectionReference
+                            .document(Id)
+                            .set(data)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                }
+                            })
+
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                }
+                            });
                 }
 
                 else {
+
+                    // For Test, Delete before submit -- Yee Lin
                     Toast.makeText(getApplicationContext(), "Bad", Toast.LENGTH_LONG).show();
                 }
             }
         });
+
+        intent.putExtra("User Name", name);
+        setResult(0, intent);
+        finish();
     }
 
 }

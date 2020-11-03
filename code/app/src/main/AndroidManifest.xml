@@ -22,7 +22,7 @@
         <activity android:name=".activities.ChangeProfile"
             android:parentActivityName=".MainActivity" />
 
-        <activity android:name=".activities.UserLogin"
+        <activity android:name=".activities.UserSignUp"
             android:parentActivityName=".MainActivity" />
     </application>
 
