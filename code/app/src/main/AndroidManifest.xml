@@ -21,6 +21,9 @@
 
         <activity android:name=".activities.ChangeProfile"
             android:parentActivityName=".MainActivity" />
+
+        <activity android:name=".activities.UserLogin"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

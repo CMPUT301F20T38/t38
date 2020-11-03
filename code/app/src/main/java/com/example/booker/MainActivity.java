@@ -25,7 +25,6 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db;
-    HashMap<String, String> data = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
