@@ -27,6 +27,9 @@
 
         <activity android:name=".activities.UserLogin"
             android:parentActivityName=".MainActivity" />
+
+        <activity android:name=".activities.AddOwnerBook"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>
