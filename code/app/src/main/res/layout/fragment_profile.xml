@@ -50,13 +50,14 @@
             android:background="#D5D8DC" />
 
         <LinearLayout
-            android:id="@+id/profile_borrow"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="10dp">
 
             <TextView
+                android:id="@+id/profile_borrow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_profile_borrow"

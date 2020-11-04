@@ -9,23 +9,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name">
+        <activity android:name=".activities.BorrowedBookListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name">
 
-        <activity android:name=".activities.ChangeProfile"
+        </activity>
+        <activity
+            android:name=".activities.ChangeProfile"
             android:parentActivityName=".MainActivity" />
-
-        <activity android:name=".activities.UserSignUp"
+        <activity
+            android:name=".activities.UserSignUp"
             android:parentActivityName=".MainActivity" />
-
-        <activity android:name=".activities.UserLogin"
+        <activity
+            android:name=".activities.UserLogin"
             android:parentActivityName=".MainActivity" />
     </application>
 
