@@ -1,7 +1,9 @@
 package com.example.booker.activities;
 
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,11 +40,11 @@ public class UserSignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        userName = (EditText) findViewById(R.id.login_username);
-        userEmail = (EditText) findViewById(R.id.login_email);
-        userPassword = (EditText) findViewById(R.id.login_password);
+        userName = (EditText) findViewById(R.id.sign_up_username);
+        userEmail = (EditText) findViewById(R.id.sign_up_email);
+        userPassword = (EditText) findViewById(R.id.sign_up_password);
 
-        btnSubmit = (Button) findViewById(R.id.login_submit);
+        btnSubmit = (Button) findViewById(R.id.sign_up_submit);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -50,12 +52,12 @@ public class UserSignUp extends AppCompatActivity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                login();
+                signUp();
             }
         });
     }
 
-    private void login() {
+    private void signUp() {
         final Intent intent = getIntent();
         final String name = userName.getText().toString();
         String email = userEmail.getText().toString();
@@ -79,11 +81,11 @@ public class UserSignUp extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()){
+                if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
                     HashMap<String, String> data = new HashMap<>();
 
-                    CollectionReference collectionReference = db.collection("Users");
+                    CollectionReference collectionReference = db.collection("User");
                     data.put("Name", name);
                     String Id = user.getUid();
 
@@ -95,14 +97,15 @@ public class UserSignUp extends AppCompatActivity {
                                 public void onSuccess(Void aVoid) {
                                 }
                             })
-
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
+
                                 }
                             });
-                }
 
+
+                }
                 else {
 
                     // For Test, Delete before submit -- Yee Lin

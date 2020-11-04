@@ -18,7 +18,9 @@ import androidx.fragment.app.Fragment;
 import com.example.booker.MainActivity;
 import com.example.booker.R;
 import com.example.booker.activities.ChangeProfile;
+import com.example.booker.activities.UserLogin;
 import com.example.booker.activities.UserSignUp;
+import com.example.booker.data.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -70,6 +72,8 @@ public class ProfileFragment extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), UserLogin.class);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -96,6 +100,10 @@ public class ProfileFragment extends Fragment {
         if (requestCode == 0){
             if (resultCode == 0){
                 textView.setText(data.getStringExtra("User Name"));
+            }
+
+            if (requestCode == 1){
+                Toast.makeText(getContext(), "Login Successful", Toast.LENGTH_LONG).show();
             }
         }
         if (requestCode == 1){
