@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,16 +33,19 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks> {
         View view = convertView;
 
         if(view==null){
-            view = LayoutInflater.from(context).inflate(R.layout.borrowed_book_list, parent,false);
+            view = LayoutInflater.from(context).inflate(R.layout.borrowed_book_content, parent,false);
         }
 
         BorrowedBooks borrowedBook = borrowedBooks.get(position);
 
         ImageView borrowed_img = view.findViewById(R.id.borrowed_img);
+        ImageView map_img = view.findViewById(R.id.borrowed_map);
         TextView borrowed_title = view.findViewById(R.id.borrowed_title);
         TextView borrowed_author = view.findViewById(R.id.borrowed_author);
         TextView borrowed_status = view.findViewById(R.id.borrowed_status);
         TextView borrowed_owner_username = view.findViewById(R.id.borrowed_owner_username);
+        Button accept_book = view.findViewById(R.id.accept_borrowed_book);
+        Button return_book = view.findViewById(R.id.return_borrowed_book);
 
         //the img resourse will be changed later, but now it will just use sample
         borrowed_img.setImageResource(R.mipmap.testimg);
@@ -49,6 +53,16 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks> {
         borrowed_author.setText(borrowedBook.getAuthor());
         borrowed_status.setText(borrowedBook.getStatus());
         borrowed_owner_username.setText(borrowedBook.getOwner_name());
+        //set the button change and visibility of map
+        if(borrowedBook.getStatus().equals("borrowed")){
+            accept_book.setVisibility(View.GONE);
+            return_book.setVisibility(View.VISIBLE);
+            map_img.setVisibility(View.INVISIBLE);
+        }else{
+            accept_book.setVisibility(View.VISIBLE);
+            return_book.setVisibility(View.GONE);
+            map_img.setVisibility(View.VISIBLE);
+        }
 
         return view;
     }

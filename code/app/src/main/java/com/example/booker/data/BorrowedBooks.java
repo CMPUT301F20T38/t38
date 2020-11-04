@@ -19,6 +19,8 @@ public class BorrowedBooks {
         this.status = status;
     }
 
+    public BorrowedBooks(){}
+
     public String getSrc() {
         return src;
     }

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
     private ListView borrowed_list;
     private ArrayList<BorrowedBooks> borrowedBooksList;
     private ArrayAdapter<BorrowedBooks> borrowedBooksAdapter;
+    private Button accept_book, return_book;
     private ImageView borrowed_img;
     private TextView borrowed_title, borrowed_author, borrowed_status, borrowed_owner_username;
 
@@ -48,6 +50,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
         borrowedBooksList = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         Log.e(TAG, mAuth.getCurrentUser().getUid());
         final CollectionReference collectionReference = db.collection("User")
                 .document(mAuth.getCurrentUser().getUid()).collection("Borrowed");
