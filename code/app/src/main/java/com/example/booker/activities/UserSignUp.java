@@ -11,8 +11,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.booker.R;
+import com.example.booker.ui.profile.ProfileViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -95,12 +97,16 @@ public class UserSignUp extends AppCompatActivity {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
+                                    intent.putExtra("User Name", name);
+                                    setResult(0, intent);
+                                    finish();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-
+                                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                    user.getUid();
                                 }
                             });
 
@@ -114,9 +120,6 @@ public class UserSignUp extends AppCompatActivity {
             }
         });
 
-        intent.putExtra("User Name", name);
-        setResult(0, intent);
-        finish();
     }
 
 }
