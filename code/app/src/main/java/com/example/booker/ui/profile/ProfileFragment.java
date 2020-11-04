@@ -17,17 +17,19 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.booker.R;
+import com.example.booker.activities.BorrowedBookListActivity;
 import com.example.booker.activities.ChangeProfile;
 import com.example.booker.activities.UserLogin;
 import com.example.booker.activities.UserSignUp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class ProfileFragment extends Fragment {
 
     private LinearLayout changeProfile;
-    private TextView textView;
+    private TextView textView, profile_borrow;
     private Button btnLogin;
     private Button btnSignUp;
     private Button btnSignOut;
@@ -42,6 +44,7 @@ public class ProfileFragment extends Fragment {
         final View root = inflater.inflate(R.layout.fragment_profile, container, false);
         profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
         textView = (TextView) getActivity().findViewById(R.id.user_name);
+        profile_borrow =(TextView)  getActivity().findViewById(R.id.profile_borrow);
         profileViewModel.getUserName().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -57,9 +60,27 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         changeProfile = (LinearLayout) getActivity().findViewById(R.id.user_profile);
         textView = (TextView) getActivity().findViewById(R.id.user_name);
+        profile_borrow =(TextView)  getActivity().findViewById(R.id.profile_borrow);
         btnLogin = (Button) getActivity().findViewById(R.id.profile_login);
         btnSignUp = (Button) getActivity().findViewById(R.id.profile_sign_up);
         btnSignOut = (Button) getActivity().findViewById(R.id.profile_sign_out);
+
+        //button to borrowed book activity
+        profile_borrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //check whether there's user logged in first, if there is, then intent
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user == null){
+                    Toast.makeText(getContext(), "Please log in first!", Toast.LENGTH_LONG).show();
+                }else{
+                    Intent intent = new Intent(view.getContext(), BorrowedBookListActivity.class);
+                    startActivity(intent);
+                }
+
+            }
+        });
+
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
