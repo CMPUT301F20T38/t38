@@ -4,8 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -36,6 +39,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
     private ListView borrowed_list;
     private ArrayList<BorrowedBooks> borrowedBooksList;
     private ArrayAdapter<BorrowedBooks> borrowedBooksAdapter;
+    private TextView return_button;
     private Button accept_book, return_book;
     private ImageView borrowed_img;
     private TextView borrowed_title, borrowed_author, borrowed_status, borrowed_owner_username;
@@ -46,12 +50,13 @@ public class BorrowedBookListActivity extends AppCompatActivity {
         setContentView(R.layout.borrowed_book_list);
 
         borrowed_list = findViewById(R.id.borrowed_list);
+        return_button = findViewById(R.id.borrowed_return);
 
         borrowedBooksList = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        Log.e(TAG, mAuth.getCurrentUser().getUid());
+        //Log.e(TAG, mAuth.getCurrentUser().getUid());
         final CollectionReference collectionReference = db.collection("User")
                 .document(mAuth.getCurrentUser().getUid()).collection("Borrowed");
 
@@ -97,6 +102,13 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                     borrowedBooksList.add(new BorrowedBooks(src, title, author, owner_name, status));
                 }
                 borrowedBooksAdapter.notifyDataSetChanged();
+            }
+        });
+
+        return_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }
