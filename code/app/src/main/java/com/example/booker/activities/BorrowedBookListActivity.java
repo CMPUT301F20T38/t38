@@ -71,11 +71,6 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                                 BorrowedBooks borrowedBooks = document.toObject(BorrowedBooks.class);
                                 borrowedBooksList.add(borrowedBooks);
 
-                                /*String borrowed_img = borrowedBooks.getSrc();
-                                String borrowed_title = borrowedBooks.getTitle();
-                                String borrowed_author = borrowedBooks.getAuthor();
-                                String borrowed_status = borrowedBooks.getStatus();
-                                String borrowed_owner_name = borrowedBooks.getOwner_name();*/
                                 Log.d(TAG, document.getId() + " => " + document.getData());
                             }
                         } else {
