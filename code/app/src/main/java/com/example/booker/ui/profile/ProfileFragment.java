@@ -75,7 +75,7 @@ public class ProfileFragment extends Fragment {
                     Toast.makeText(getContext(), "Please log in first!", Toast.LENGTH_LONG).show();
                 }else{
                     Intent intent = new Intent(view.getContext(), BorrowedBookListActivity.class);
-                    startActivity(intent);
+                    startActivityForResult(intent, 0);
                 }
 
             }

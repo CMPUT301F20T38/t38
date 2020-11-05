@@ -9,17 +9,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.BorrowedBookListActivity">
-            
-        </activity>
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name">
+        <activity android:name=".activities.RequestListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.BorrowedBookListActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".activities.ChangeProfile"
@@ -30,8 +38,8 @@
         <activity
             android:name=".activities.UserLogin"
             android:parentActivityName=".MainActivity" />
-
-        <activity android:name=".activities.AddOwnerBook"
+        <activity
+            android:name=".activities.AddOwnerBook"
             android:parentActivityName=".MainActivity" />
     </application>
 
