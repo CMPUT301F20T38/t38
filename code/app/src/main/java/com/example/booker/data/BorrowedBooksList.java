@@ -52,7 +52,7 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks> {
         borrowed_title.setText(borrowedBook.getTitle());
         borrowed_author.setText(borrowedBook.getAuthor());
         borrowed_status.setText(borrowedBook.getStatus());
-        borrowed_owner_username.setText(borrowedBook.getOwner_name());
+        borrowed_owner_username.setText(borrowedBook.getOwner());
         //set the button change and visibility of map
         if(borrowedBook.getStatus().equals("borrowed")){
             accept_book.setVisibility(View.GONE);
