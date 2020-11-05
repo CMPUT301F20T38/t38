@@ -20,6 +20,7 @@
             android:paddingBottom="20dp">
 
             <TextView
+                android:id="@+id/show_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -28,13 +29,14 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/user_name"
+                android:id="@+id/show_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/show_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
