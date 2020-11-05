@@ -42,14 +42,11 @@ public class LendFragment extends Fragment {
                              Bundle saveInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_lend, container, false);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String userId = user.getUid();
         btnAdd = (Button) root.findViewById(R.id.owner_book_add);
         ownerList = (ListView) root.findViewById(R.id.owner_book_list);
-
-
-        final List<Map<String, Object>> bookList = new ArrayList<Map<String, Object>>();
 
         if (userId != null) {
             CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
@@ -58,6 +55,7 @@ public class LendFragment extends Fragment {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
+                        final List<Map<String, Object>> bookList = new ArrayList<Map<String, Object>>();
                         for (QueryDocumentSnapshot document : task.getResult()){
                             Map<String, Object> map = new HashMap<String, Object>();
                             map.put("author", document.getString("author"));
@@ -66,10 +64,12 @@ public class LendFragment extends Fragment {
                             Log.d("data", document.getString("author"));
                             bookList.add(map);
                         }
+                        ownerAdapter = new OwnerListViewAdapter(getContext(), bookList);
+                        ownerList.setAdapter(ownerAdapter);
 
                     }
                     else {
-                        Log.d("Hello", "Fail");
+                        Log.d("Retrieve Data", "Fail");
                     }
 
                 }
@@ -78,10 +78,6 @@ public class LendFragment extends Fragment {
         else {
         }
 
-        Log.d("Hel", "HJasdfasdf");
-
-        ownerAdapter = new OwnerListViewAdapter(getContext(), bookList);
-        ownerList.setAdapter(ownerAdapter);
         Log.d("Adaper", "Miracle");
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +96,15 @@ public class LendFragment extends Fragment {
 
         return root;
 
+    }
+
+    private void initialData(FirestoreCallback firestoreCallback){
+
+    }
+
+
+    private interface FirestoreCallback {
+        void onCallback(List<Map<String, Object>> list);
     }
 
 }
