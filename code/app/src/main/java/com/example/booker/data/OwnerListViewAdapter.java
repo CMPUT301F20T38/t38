@@ -1,6 +1,7 @@
 package com.example.booker.data;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +19,11 @@ public class OwnerListViewAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private Context context;
 
-    public OwnerListViewAdapter(List<Map<String, Object>> bookList, Context context) {
+    public OwnerListViewAdapter(Context context, List<Map<String, Object>> bookList) {
         this.bookList = bookList;
-        this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
+        this.layoutInflater = LayoutInflater.from(context);
+
     }
 
     public class Component{
@@ -35,6 +37,7 @@ public class OwnerListViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        Log.d("BOOOK SIZE", bookList.toString());
         return bookList.size();
     }
 
@@ -50,6 +53,7 @@ public class OwnerListViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+        Log.d("cs", "go");
         Component component = null;
         if (view == null){
 
@@ -61,12 +65,13 @@ public class OwnerListViewAdapter extends BaseAdapter {
             component.borrowerTag = (TextView) view.findViewById(R.id.owner_borrower_tag);
             component.borrowerName = (TextView) view.findViewById(R.id.owner_borrower_name);
             component.status = (TextView) view.findViewById(R.id.owner_book_status);
-
+            Log.d("hello","123");
             view.setTag(component);
         }
 
         else {
             component = (Component) view.getTag();
+            Log.d("null", "hello");
         }
 
         component.author.setText((String)bookList.get(i).get("author"));

@@ -1,5 +1,7 @@
 package com.example.booker.data;
 
+import android.util.Log;
+
 public class Book {
     private String author;
     private String title;
