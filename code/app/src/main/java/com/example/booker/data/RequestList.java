@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -63,10 +64,14 @@ public class RequestList extends ArrayAdapter<Request> {
         request_accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //the document path for book will be change later
+                //find the path to the correspond Request
                 final CollectionReference collectionReference = db.collection("User")
                         .document(mAuth.getCurrentUser().getUid()).collection("Lend")
                         .document(request.getBook_name()).collection("Requests");
+                //change book status for owner
+                db.collection("User").document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend").document(request.getBook_name()).update("status","accepted");
+
 /*                //change borrow status for accepted user
                 db.collection("User").get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
