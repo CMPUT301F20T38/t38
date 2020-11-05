@@ -27,12 +27,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,6 +92,17 @@ public class LendFragment extends Fragment {
             }
         });
 
+        //For test
+        DocumentReference useTest = db.collection("User").document(userId);
+        useTest.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot test = task.getResult();
+                    Log.d("User Name", test.get("Name").toString());
+            }
+        });
+
+
         if (userId != null) {
 
             CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
@@ -100,7 +113,7 @@ public class LendFragment extends Fragment {
                     Log.d("AddSnapshotListener", "Notify Data changed");
 
                     for (DocumentSnapshot documentSnapshot : value) {
-                        Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("ISBN"),
+                        Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
                                 documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
                         bookList.add(book);
                         Log.d(documentSnapshot.get("title").toString(), "added");
