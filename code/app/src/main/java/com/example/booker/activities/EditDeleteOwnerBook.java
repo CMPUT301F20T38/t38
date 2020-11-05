@@ -77,6 +77,9 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d("Owner's check request", "Under Construction");
+                Intent intent_request = new Intent(view.getContext(),RequestListActivity.class);
+                intent_request.putExtra("BookName",book.getTitle());
+                startActivity(intent_request);
             }
         });
 
