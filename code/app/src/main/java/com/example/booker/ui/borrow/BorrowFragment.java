@@ -18,12 +18,14 @@ import androidx.fragment.app.Fragment;
 import com.example.booker.R;
 import com.example.booker.activities.UserSignUp;
 import com.example.booker.data.OwnerListViewAdapter;
+import com.example.booker.data.SearchListViewAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -39,9 +41,10 @@ public class BorrowFragment extends Fragment {
     private Button btnSearch;
     private EditText searchEditText;
     private ListView searchList;
-    private OwnerListViewAdapter searchAdapter;
+    private SearchListViewAdapter searchAdapter;
     private FirebaseFirestore db;
     private String search_content;
+    private String ownerusername;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle saveInstanceState) {
@@ -95,10 +98,21 @@ public class BorrowFragment extends Fragment {
 
                 for (String uid : userids) {
                     Log.e("user", uid);
-                    Log.e("searchcontent", search_content );
+                    Log.e("searchcontent", search_content);
+
+
+
+                    db.collection("User").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            ownerusername = task.getResult().getString("Name");
+                        }
+                    });
+
+
+
 
                     db.collection("User").document(uid).collection("Lend")
-                            .whereEqualTo("title",search_content)
                             .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -107,21 +121,35 @@ public class BorrowFragment extends Fragment {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
 
                                         Log.e("book", document.getString("title"));
+                                        String thisauthor =  document.getString("author");
+                                        String thistitle = document.getString("title");
+                                        String thisISBN = document.getString("ISBN");
+                                        String thisstatus = document.getString("status");
 
                                         Map<String, Object> map = new HashMap<String, Object>();
                                         map.put("author", document.getString("author"));
                                         map.put("title", document.getString("title"));
-                                        map.put("ISBN", document.getString("ISBN"));
-                                        Log.d("data", document.getString("author"));
-                                        booklist.add(map);
+                                        map.put("ISBN", document.getString("isbn"));
+
+                                        map.put("owner",ownerusername);
+                                        map.put("status",document.getString("status"));
+
+
+                                        //ISBN not included yet
+                                        if (thisauthor.contains(search_content) || thistitle.contains(search_content)
+                                                && (thisstatus == "available" || thisstatus == "requested")){
+                                            booklist.add(map);
+                                        }
+
                                     }
 
-                                    searchAdapter = new OwnerListViewAdapter(getContext(),booklist);
+                                    searchAdapter = new SearchListViewAdapter(getContext(),booklist);
                                     searchList.setAdapter(searchAdapter);
 
                                     searchEditText.setText("");
                                 }
                             });
+
                 }
             }
 
