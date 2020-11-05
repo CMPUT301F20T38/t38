@@ -4,19 +4,12 @@ package com.example.booker.data;
  * Stores borrowed book data including title, author, owner name, and status
  * src is the link of resource img
  */
-public class BorrowedBooks {
+public class BorrowedBooks extends Book{
     private String src;
-    private String title;
-    private String author;
-    private String owner;
-    private String status;
 
-    public BorrowedBooks(String src, String title, String author, String owner, String status) {
+    public BorrowedBooks(String author, String title, String ISBN, String status, String owner, String borrower, String src) {
+        super(author, title, ISBN, status, owner, borrower);
         this.src = src;
-        this.title = title;
-        this.author = author;
-        this.owner = owner;
-        this.status = status;
     }
 
     public BorrowedBooks(){}
@@ -25,19 +18,4 @@ public class BorrowedBooks {
         return src;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getOwner_name() {
-        return owner;
-    }
-
-    public String getStatus() {
-        return status;
-    }
 }
