@@ -16,12 +16,14 @@ import androidx.fragment.app.Fragment;
 
 import com.example.booker.R;
 import com.example.booker.activities.AddOwnerBook;
+import com.example.booker.data.Book;
 import com.example.booker.data.OwnerListViewAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -37,6 +39,7 @@ public class LendFragment extends Fragment {
     private ListView ownerList;
     private OwnerListViewAdapter ownerAdapter;
     private FirebaseFirestore db;
+    private ArrayList<Book> bookList;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle saveInstanceState) {
@@ -44,9 +47,12 @@ public class LendFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String userId = user.getUid();
+        final String userId = user.getUid();
         btnAdd = (Button) root.findViewById(R.id.owner_book_add);
         ownerList = (ListView) root.findViewById(R.id.owner_book_list);
+
+        bookList = new ArrayList<>();
+        ownerAdapter = new OwnerListViewAdapter(getContext(), bookList);
 
         if (userId != null) {
             CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
@@ -55,18 +61,13 @@ public class LendFragment extends Fragment {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
-                        final List<Map<String, Object>> bookList = new ArrayList<Map<String, Object>>();
-                        for (QueryDocumentSnapshot document : task.getResult()){
-                            Map<String, Object> map = new HashMap<String, Object>();
-                            map.put("author", document.getString("author"));
-                            map.put("title", document.getString("title"));
-                            map.put("ISBN", document.getString("ISBN"));
-                            Log.d("data", document.getString("author"));
-                            bookList.add(map);
-                        }
-                        ownerAdapter = new OwnerListViewAdapter(getContext(), bookList);
-                        ownerList.setAdapter(ownerAdapter);
 
+                        for (DocumentSnapshot document : task.getResult()){
+                            Book book = new Book(document.getString("author"), document.getString("title"), document.getString("ISBN"),
+                                    document.getString("status"), userId, document.getString("borrower"));
+                            bookList.add(book);
+                        }
+                        ownerAdapter.notifyDataSetChanged();
                     }
                     else {
                         Log.d("Retrieve Data", "Fail");
@@ -77,6 +78,8 @@ public class LendFragment extends Fragment {
         }
         else {
         }
+
+        ownerList.setAdapter(ownerAdapter);
 
         Log.d("Adaper", "Miracle");
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -98,13 +101,6 @@ public class LendFragment extends Fragment {
 
     }
 
-    private void initialData(FirestoreCallback firestoreCallback){
 
-    }
-
-
-    private interface FirestoreCallback {
-        void onCallback(List<Map<String, Object>> list);
-    }
 
 }
