@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -16,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.booker.R;
 import com.example.booker.activities.AddOwnerBook;
+import com.example.booker.activities.EditDeleteOwnerBook;
 import com.example.booker.data.Book;
 import com.example.booker.data.OwnerListViewAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -72,7 +74,6 @@ public class LendFragment extends Fragment {
                     else {
                         Log.d("Retrieve Data", "Fail");
                     }
-
                 }
             });
         }
@@ -80,6 +81,16 @@ public class LendFragment extends Fragment {
         }
 
         ownerList.setAdapter(ownerAdapter);
+
+        ownerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Book book = (Book) ownerList.getItemAtPosition(i);
+                Intent intent = new Intent(view.getContext(), EditDeleteOwnerBook.class);
+                intent.putExtra("YeeSkywalker", book);
+                startActivityForResult(intent, 0);
+            }
+        });
 
         Log.d("Adaper", "Miracle");
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +109,14 @@ public class LendFragment extends Fragment {
         });
 
         return root;
+    }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 0){
+
+        }
     }
 
 
