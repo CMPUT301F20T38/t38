@@ -8,14 +8,14 @@ public class BorrowedBooks {
     private String src;
     private String title;
     private String author;
-    private String owner_name;
+    private String owner;
     private String status;
 
-    public BorrowedBooks(String src, String title, String author, String owner_name, String status) {
+    public BorrowedBooks(String src, String title, String author, String owner, String status) {
         this.src = src;
         this.title = title;
         this.author = author;
-        this.owner_name = owner_name;
+        this.owner = owner;
         this.status = status;
     }
 
@@ -34,7 +34,7 @@ public class BorrowedBooks {
     }
 
     public String getOwner_name() {
-        return owner_name;
+        return owner;
     }
 
     public String getStatus() {
