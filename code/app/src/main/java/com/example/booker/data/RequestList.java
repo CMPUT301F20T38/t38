@@ -66,7 +66,7 @@ public class RequestList extends ArrayAdapter<Request> {
                 //the document path for book will be change later
                 final CollectionReference collectionReference = db.collection("User")
                         .document(mAuth.getCurrentUser().getUid()).collection("Lend")
-                        .document("aaa").collection("Requests");
+                        .document(request.getBook_name()).collection("Requests");
 /*                //change borrow status for accepted user
                 db.collection("User").get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -79,7 +79,7 @@ public class RequestList extends ArrayAdapter<Request> {
                                             //the book name path here will be changed later
                                             //may have some issue in get field here???
                                             db.collection("User").document(document.getId()).collection("Borrowed")
-                                                    .document("aaa").update("status","accepted")
+                                                    .document(request.getBook_name()).update("status","accepted")
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
@@ -113,7 +113,7 @@ public class RequestList extends ArrayAdapter<Request> {
                                                     //the book name path here will be changed later, path will change here ???
                                                     //if decline a request, than for the user trying to borrow the book, it will disappear and send notification
                                                     db.collection("User").document(document.getId()).collection("Borrowed")
-                                                            .document("aaa").delete()
+                                                            .document(request.getBook_name()).delete()
                                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                 @Override
                                                                 public void onSuccess(Void aVoid) {
@@ -153,7 +153,7 @@ public class RequestList extends ArrayAdapter<Request> {
                 //the document path for book will be change later
                 final CollectionReference collectionReference = db.collection("User")
                         .document(mAuth.getCurrentUser().getUid()).collection("Lend")
-                        .document("aaa").collection("Requests");
+                        .document(request.getBook_name()).collection("Requests");
 /*                db.collection("User").get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -165,7 +165,7 @@ public class RequestList extends ArrayAdapter<Request> {
                                             //the book name path here will be changed later, path will change here ???
                                             //if decline a request, than for the user trying to borrow the book, it will disappear and send notification
                                             db.collection("User").document(document.getId()).collection("Borrowed")
-                                                    .document("aaa").delete()
+                                                    .document(request.getBook_name()).delete()
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {

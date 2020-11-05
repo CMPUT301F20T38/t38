@@ -34,6 +34,7 @@ public class RequestListActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private ArrayList<Request> requestList;
     private ArrayAdapter<Request> requestAdapter;
+    private String book_name;
     private TextView return_button, request_accept, request_decline;
 
     @Override
@@ -50,11 +51,13 @@ public class RequestListActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        book_name = getIntent().getStringExtra("BookName");
+        Log.e("bookname++++++++++++++++++",book_name);
 
         //change the path of the book(document) here in later coding
         final CollectionReference collectionReference = db.collection("User")
                 .document(mAuth.getCurrentUser().getUid()).collection("Lend")
-                .document("aaa").collection("Requests");
+                .document(book_name).collection("Requests");
 
 
         //get each request for each book
@@ -65,7 +68,7 @@ public class RequestListActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                requestList.add(new Request(document.getId()));
+                                requestList.add(new Request(document.getId(),book_name));
                                 //Log.e(TAG, "added");
                             }
                         } else {
@@ -84,7 +87,7 @@ public class RequestListActivity extends AppCompatActivity {
 
                 for(QueryDocumentSnapshot doc: queryDocumentSnapshots){
                     String user_name = (String)doc.getId();
-                    requestList.add(new Request(user_name));
+                    requestList.add(new Request(user_name,book_name));
                 }
                 requestAdapter.notifyDataSetChanged();
             }
