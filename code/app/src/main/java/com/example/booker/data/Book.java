@@ -2,7 +2,9 @@ package com.example.booker.data;
 
 import android.util.Log;
 
-public class Book {
+import java.io.Serializable;
+
+public class Book implements Serializable {
     private String author;
     private String title;
     private String ISBN;
@@ -16,6 +18,30 @@ public class Book {
         this.ISBN = ISBN;
         this.status = status;
         this.owner = owner;
+        this.borrower = borrower;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setISBN(String ISBN) {
+        this.ISBN = ISBN;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public void setBorrower(String borrower) {
         this.borrower = borrower;
     }
 
