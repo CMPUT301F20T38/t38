@@ -89,10 +89,6 @@ public class BorrowFragment extends Fragment {
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 Log.e("Initial this user", uid);
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-                                    String thisauthor = document.getString("author");
-                                    String thistitle = document.getString("title");
-                                    String thisISBN = document.getString("isbn");
-                                    String thisstatus = document.getString("status");
 
                                     Map<String, Object> map = new HashMap<String, Object>();
                                     map.put("author", document.getString("author"));
