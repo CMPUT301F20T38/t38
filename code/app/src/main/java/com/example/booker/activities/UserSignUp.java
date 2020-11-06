@@ -1,17 +1,14 @@
 package com.example.booker.activities;
 
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.booker.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,6 +23,15 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
+
+/**
+ * Yee's Part
+ * The activity allow user to sign up
+ * EditText userName: enable user to input username
+ * EditText userEmail: enable user to input email
+ * EditText userPassword: enable user to input password
+ * Button btnSubmit: sumbit the form
+ */
 
 public class UserSignUp extends AppCompatActivity {
 
@@ -51,6 +57,7 @@ public class UserSignUp extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
+        // When the button is triggered, the sign up event is occuring
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,6 +80,10 @@ public class UserSignUp extends AppCompatActivity {
 
     }
 
+    /*
+        The sign up function interat with google authenticaton
+        return: void
+     */
     private void signUp() {
 
 
@@ -96,6 +107,7 @@ public class UserSignUp extends AppCompatActivity {
             return;
         }
 
+        // When user try to create a new account, triggered the interacting event with mauth
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {

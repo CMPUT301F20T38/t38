@@ -18,6 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adapter that extends arrayadapter
+ * ArrayList book that maintaint the book class
+ * context that get current activity
+ */
 public class OwnerListViewAdapter extends ArrayAdapter<Book> {
 
     private ArrayList<Book> books;
@@ -31,6 +36,7 @@ public class OwnerListViewAdapter extends ArrayAdapter<Book> {
 
 
 
+    // getView that inflate the view of each item in the arraylist
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
         View view = convertView;
