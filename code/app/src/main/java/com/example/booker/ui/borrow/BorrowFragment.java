@@ -37,6 +37,11 @@ import java.util.Map;
 
 /**
  * This is a page for user to search book and request to borrow book
+ * Button btnSearch: clickable Button which will give a list of book search by keywords
+ *
+ * Search Button onClickListener: Refresh the BookList according to the search content
+ * and clear the search content
+ *
  */
 
 public class BorrowFragment extends Fragment {
