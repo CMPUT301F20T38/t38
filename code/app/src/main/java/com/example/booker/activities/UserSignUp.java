@@ -101,15 +101,6 @@ public class UserSignUp extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
-                    UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest
-                            .Builder().setDisplayName(userName.getText().toString().trim()).build();
-
-                    user.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Log.d("User Name", "Added");
-                        }
-                    });
                     Log.d("Sign up", "Good");
                     HashMap<String, String> data = new HashMap<>();
 

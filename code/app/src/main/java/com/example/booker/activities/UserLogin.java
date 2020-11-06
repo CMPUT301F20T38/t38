@@ -17,6 +17,13 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+ /**
+  * Yee's Part
+  * The activity allow user to login
+  * EditText userEmail: enable user to input email
+  * EditText userPassword: enable user to input password
+  * Button btnSubmit: sumbit the form
+  */
  public class UserLogin extends AppCompatActivity {
 
     private EditText userEmail;
@@ -36,6 +43,7 @@ import com.google.firebase.auth.FirebaseUser;
 
         mAuth = FirebaseAuth.getInstance();
 
+        // When button is click, excute the login method
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -44,6 +52,10 @@ import com.google.firebase.auth.FirebaseUser;
         });
     }
 
+    /*
+        Execute the login event
+        return: void
+     */
     private void login() {
 
         Intent intent = getIntent();
@@ -60,6 +72,7 @@ import com.google.firebase.auth.FirebaseUser;
             return;
         }
 
+        
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {

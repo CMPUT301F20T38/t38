@@ -14,11 +14,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.booker.R;
 import com.example.booker.data.Book;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
     private Button btnEdit, btnDelete, btnRequest;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,6 +36,8 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         String author = book.getAuthor();
         String title = book.getTitle();
         String ISBN = book.getISBN();
+
+
 
         editTitle = (EditText) findViewById(R.id.owner_ed_title);
         editAuthor = (EditText) findViewById(R.id.owner_ed_author);
