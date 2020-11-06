@@ -21,6 +21,8 @@ public class Book implements Serializable {
         this.borrower = borrower;
     }
 
+    public Book(){}
+
     public void setAuthor(String author) {
         this.author = author;
     }
