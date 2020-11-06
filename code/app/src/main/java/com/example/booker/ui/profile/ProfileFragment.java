@@ -122,6 +122,13 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+            }
+        });
+
         return root;
     }
 

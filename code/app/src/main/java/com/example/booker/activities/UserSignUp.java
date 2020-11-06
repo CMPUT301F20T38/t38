@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -56,9 +57,25 @@ public class UserSignUp extends AppCompatActivity {
                 signUp();
             }
         });
+
+        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            }
+        });
+
+        mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                Log.d("User State", "Change");
+            }
+        });
+
     }
 
     private void signUp() {
+
+
         final Intent intent = getIntent();
         final String name = userName.getText().toString();
         String email = userEmail.getText().toString();
@@ -83,8 +100,17 @@ public class UserSignUp extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Log.d("Sign up", "Good");
                     FirebaseUser user = mAuth.getCurrentUser();
+                    UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest
+                            .Builder().setDisplayName(userName.getText().toString().trim()).build();
+
+                    user.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.d("User Name", "Added");
+                        }
+                    });
+                    Log.d("Sign up", "Good");
                     HashMap<String, String> data = new HashMap<>();
 
                     CollectionReference collectionReference = db.collection("User");
@@ -97,6 +123,7 @@ public class UserSignUp extends AppCompatActivity {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
+                                    Log.d("Sign Up Data Setting", "Success");
                                     intent.putExtra("User Name", name);
                                     setResult(0, intent);
                                     finish();
@@ -105,21 +132,18 @@ public class UserSignUp extends AppCompatActivity {
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                    user.getUid();
+                                    Log.d("Sign Up Data Setting", "Fail");
                                 }
                             });
-
-
                 }
                 else {
                     Log.d("Sign up", "Fail");
-                    // For Test, Delete before submit -- Yee Lin
-                    Toast.makeText(getApplicationContext(), "Bad", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
     }
+
+
 
 }
