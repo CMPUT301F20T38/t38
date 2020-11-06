@@ -1,0 +1,6 @@
+com.example.booker
+com.example.booker.activities
+com.example.booker.data
+com.example.booker.ui.borrow
+com.example.booker.ui.lend
+com.example.booker.ui.profile
