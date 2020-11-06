@@ -17,6 +17,19 @@ import com.example.booker.data.Book;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Yee's Part
+ * The activity allow user to edit or delete book
+ * EditText author: Enable user to input author name when attend to edit a book
+ * EditText title: Enable user to input title name when attend to edit a boook
+ * EditText ISBN: Enable user to input ISBN when attend to edit a boook
+ * Button btnEdit: sumbit the form
+ * Button btnDelete: delete the book from intent extract
+ * Button btnRequest: jump to request activities
+ * FirebaseAuth mAuth: the token of firebasemAuth reference
+ * FirebaseFirestore db: the token of firebasefirestore reference
+ */
+
 public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
@@ -55,6 +68,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         editAuthor.addTextChangedListener(textWatcher);
         editISBN.addTextChangedListener(textWatcher);
 
+        // when the edit button is clicked, begin to submit book information to firestore
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,6 +83,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
             }
         });
 
+        // when the delete button is clicked, begin to delete book from firestore
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,6 +94,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
             }
         });
 
+        // when the user request to see their book request of the current book
         btnRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,6 +107,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
     }
 
+    // TextWatcher that ensures user have input all needed information brefore submit
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

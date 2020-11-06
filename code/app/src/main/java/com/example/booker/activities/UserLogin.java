@@ -72,7 +72,7 @@ import com.google.firebase.auth.FirebaseUser;
             return;
         }
 
-        
+        // User mAuth sign in function that sign user in and detect user login state
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
