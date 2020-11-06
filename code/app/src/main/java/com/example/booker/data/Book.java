@@ -4,6 +4,17 @@ import android.util.Log;
 
 import java.io.Serializable;
 
+/**
+ * Book class that have attribute
+ * @param : String author
+ * @param : String title
+ * @param : String ISBN
+ * @param : String status
+ * @param : String owner
+ * @param : String borrower
+ *
+ * This class has getter and setter method as well as constructor
+ */
 public class Book implements Serializable {
     private String author;
     private String title;

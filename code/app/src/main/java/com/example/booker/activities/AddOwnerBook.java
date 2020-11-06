@@ -26,6 +26,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DecimalFormat;
 
+/**
+ * Yee's Part
+ * The activity allow user to add new book as owner
+ * EditText author: Enable user to input author name when attend to add a book
+ * EditText title: Enable user to input title name when attend to add a boook
+ * EditText ISBN: Enable user to input ISBN when attend to add a boook
+ * Button btnComfirm: sumbit the form
+ *
+ * FirebaseAuth mAuth: the token of firebasemAuth reference
+ * FirebaseFirestore db: the token of firebasefirestore reference
+ */
+
 public class AddOwnerBook extends AppCompatActivity {
     private EditText author;
     private EditText title;
@@ -65,6 +77,7 @@ public class AddOwnerBook extends AppCompatActivity {
             ISBN.requestFocus();
         }
 
+        // when button is trigger, begin to interacet with firestore
         btnComfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

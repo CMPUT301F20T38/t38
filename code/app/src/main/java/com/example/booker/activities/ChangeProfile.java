@@ -32,6 +32,16 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Yee's Part
+ * The activity allow user to change contact method
+ * EditText userEmail: enable user to input email
+ * EditText userPassword: enable user to input password
+ * Button btnSubmit: sumbit the form
+ * FirebaseFirestore db: the token of firebasefirestore reference
+ */
+
 public class ChangeProfile extends AppCompatActivity {
 
     private EditText changeEmail, changePassword;
@@ -60,17 +70,21 @@ public class ChangeProfile extends AppCompatActivity {
         changeEmail.addTextChangedListener(textWatcher);
         changePassword.addTextChangedListener(textWatcher);
 
+        // When the button is trigger, begin to interact with FireAuth
         comfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AuthCredential credential = EmailAuthProvider
                         .getCredential(userEmail, changePassword.getText().toString().trim());
 
+                // Listener that take user reauthenticate and recieve new credential
                 user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d("User reauthentication", "successful");
+
+                            // Update user emial on complete listener, jump back to origin activity
                             user.updateEmail(changeEmail.getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -111,6 +125,7 @@ public class ChangeProfile extends AppCompatActivity {
             }
         });
 
+        // Cancel button that navigate user back to previous task
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -119,6 +134,7 @@ public class ChangeProfile extends AppCompatActivity {
         });
     }
 
+    // TextWatcher that ensures user have input all needed information brefore submit
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
