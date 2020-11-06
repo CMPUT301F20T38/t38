@@ -28,6 +28,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * RequestList class is the adapter for request list, the function of it
+ * is to customize the request list view and add click event on the
+ * request buttons
+ */
 public class RequestList extends ArrayAdapter<Request> {
     final String TAG = "request update tag";
     private ArrayList<Request> requests;
