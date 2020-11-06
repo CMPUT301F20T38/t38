@@ -2,6 +2,7 @@
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -63,10 +64,10 @@ import com.google.firebase.auth.FirebaseUser;
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
-                    FirebaseUser user = mAuth.getCurrentUser();
+                    Log.d("Login", "Success");
                 }
                 else {
-
+                    Log.d("Login","Fail");
                 }
             }
         });

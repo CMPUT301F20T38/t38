@@ -101,14 +101,14 @@ public class LendFragment extends Fragment {
                 public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                     bookList.clear();
                     Log.d("AddSnapshotListener", "Notify Data changed");
-
-                    for (DocumentSnapshot documentSnapshot : value) {
-                        Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
-                                documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
-                        bookList.add(book);
-                        Log.d(documentSnapshot.get("title").toString(), "added");
+                    if (value != null) {
+                        for (DocumentSnapshot documentSnapshot : value) {
+                            Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
+                                    documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
+                            bookList.add(book);
+                            Log.d(documentSnapshot.get("title").toString(), "added");
+                        }
                     }
-
                     ownerAdapter.notifyDataSetChanged();
                     Log.d("Owner Adapter", "Loaded");
                 }

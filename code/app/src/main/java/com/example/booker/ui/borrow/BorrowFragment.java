@@ -93,7 +93,6 @@ public class BorrowFragment extends Fragment {
 
                                 for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                    Log.e("book", document.getString("title"));
 
                                     Map<String, Object> map = new HashMap<String, Object>();
                                     map.put("author", document.getString("author"));

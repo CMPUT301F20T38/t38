@@ -35,58 +35,36 @@ public class ProfileFragment extends Fragment {
 
     private LinearLayout changeProfile;
     private TextView textView, profile_borrow;
-    private TextView contactinfo;
-    private TextView contactinfo2;
     private Button btnLogin;
     private Button btnSignUp;
     private Button btnSignOut;
-
-    private ProfileViewModel profileViewModel;
-
-    private FirebaseFirestore db;
-
-
+    private FirebaseUser user;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle saveInstanceState) {
 
         final View root = inflater.inflate(R.layout.fragment_profile, container, false);
-        profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
-        textView = (TextView) getActivity().findViewById(R.id.show_user_name);
-        profile_borrow =(TextView)  getActivity().findViewById(R.id.profile_borrow);
-        profileViewModel.getUserName().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
-    }
+        textView = (TextView) root.findViewById(R.id.show_user_name);
+        profile_borrow = (TextView) root.findViewById(R.id.profile_borrow);
+        changeProfile = (LinearLayout) root.findViewById(R.id.user_profile);
+        btnLogin = (Button) root.findViewById(R.id.profile_login);
+        btnSignUp = (Button) root.findViewById(R.id.profile_sign_up);
+        btnSignOut = (Button) root.findViewById(R.id.profile_sign_out);
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        changeProfile = (LinearLayout) getActivity().findViewById(R.id.user_profile);
-        textView = (TextView) getActivity().findViewById(R.id.show_user_name);
-        profile_borrow =(TextView)  getActivity().findViewById(R.id.profile_borrow);
-        btnLogin = (Button) getActivity().findViewById(R.id.profile_login);
-        btnSignUp = (Button) getActivity().findViewById(R.id.profile_sign_up);
-        btnSignOut = (Button) getActivity().findViewById(R.id.profile_sign_out);
-
-        //button to borrowed book activity
+        // Clickable TextView to borrowed book activity
         profile_borrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //check whether there's user logged in first, if there is, then intent
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user == null){
-                    Toast.makeText(getContext(), "Please log in first!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Please log in first!", Toast.LENGTH_SHORT).show();
                 }else{
                     Intent intent = new Intent(view.getContext(), BorrowedBookListActivity.class);
                     startActivityForResult(intent, 0);
                 }
-
             }
         });
 
@@ -94,91 +72,58 @@ public class ProfileFragment extends Fragment {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), UserSignUp.class);
-                startActivityForResult(intent, 0);
+                if (user != null){
+                    Toast.makeText(getContext(), "You have already logined", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Intent intent = new Intent(view.getContext(), UserSignUp.class);
+                    startActivity(intent);
+                }
             }
         });
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), UserLogin.class);
-                startActivityForResult(intent, 0);
+                if (user != null){
+                    Toast.makeText(getContext(), "You have already logged in", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Intent intent = new Intent(getContext(), UserLogin.class);
+                    startActivity(intent);
+                }
             }
         });
 
         btnSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                /**
-                 * For test Login id, delete before submit
-                 */
-
-                Toast.makeText(getContext(), FirebaseAuth.getInstance().getCurrentUser().getUid() + "jjjj", Toast.LENGTH_LONG).show();
+                if (user == null){
+                    Toast.makeText(getContext(), "Please Log in", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    FirebaseAuth.getInstance().signOut();
+                }
             }
         });
 
-        update_info();
 
         changeProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), ChangeProfile.class);
-                String userName = textView.getText().toString();
-                intent.putExtra("User Name", userName);
-                startActivityForResult(intent, 1);
+                if (user == null){
+                    Toast.makeText(getContext(), "Please Log in first!", Toast.LENGTH_SHORT).show();
+                }
 
+                else {
+                    Intent intent = new Intent(getContext(), ChangeProfile.class);
+                    startActivity(intent);
+                }
             }
         });
+
+        return root;
     }
 
-    public void update_info(){
-        db = FirebaseFirestore.getInstance();
-        String current_user = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        if (!current_user.equals("")){
-            db.collection("User").document(current_user).get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()){
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()){
-                                    String username = (String) document.get("Name");
-                                    String email = (String) document.get("Email");
-                                    String phone = (String) document.get("Phone");
-                                    textView.setText(username);
-                                    contactinfo = getActivity().findViewById(R.id.show_email);
-                                    contactinfo2 = getActivity().findViewById(R.id.show_phone);
-                                    contactinfo.setText("Email:" + email);
-                                    contactinfo2.setText("Phone: " + phone);
-                                }
-                            }
-                        }
-                    });
-        }
-
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0){
-            if (resultCode == 0){
-
-            }
-
-            if (requestCode == 1){
-                Toast.makeText(getContext(), "Login Successful", Toast.LENGTH_LONG).show();
-            }
-        }
-        if (requestCode == 1){
-            if (resultCode == 0){
-                contactinfo = getActivity().findViewById(R.id.show_email);
-                contactinfo2 = getActivity().findViewById(R.id.show_phone);
-                contactinfo.setText("Email:" + data.getStringExtra("email"));
-                contactinfo2.setText("Phone: " + data.getStringExtra("phone"));
-            }
-        }
-    }
 }

@@ -31,22 +31,29 @@
         </activity>
 
         <activity
-            android:name=".activities.ChangeProfile"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".activities.UserSignUp"
+            android:name=".activities.ChangeProfile">
 
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".activities.UserLogin"
-            android:parentActivityName=".MainActivity" />
+        </activity>
 
         <activity
-            android:name=".activities.AddOwnerBook"
-            android:parentActivityName=".MainActivity" />
+            android:name=".activities.UserSignUp" >
 
-        <activity android:name=".activities.EditDeleteOwnerBook"
-            android:parentActivityName=".MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".activities.UserLogin">
+
+        </activity>
+
+        <activity
+            android:name=".activities.AddOwnerBook">
+
+        </activity>
+
+        <activity
+            android:name=".activities.EditDeleteOwnerBook">
+
+        </activity>
 
     </application>
 
