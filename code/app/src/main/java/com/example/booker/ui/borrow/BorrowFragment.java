@@ -35,6 +35,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This is a page for user to search book and request to borrow book
+ */
 
 public class BorrowFragment extends Fragment {
 
@@ -52,11 +55,12 @@ public class BorrowFragment extends Fragment {
                              Bundle saveInstanceState) {
         View root = inflater.inflate(R.layout.fragment_borrow, container, false);
 
-        Log.e("Start","start");
+
 
         db = FirebaseFirestore.getInstance();
 
         //get userIDs
+
         userids = new ArrayList<String>();
 
         db.collection("User").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -64,16 +68,19 @@ public class BorrowFragment extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
 
-                    Log.e("adduser", "add");
+                    //add all userids to userids list
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         userids.add(document.getId());
                     }
-                    //get usernames
 
-                    final Map<String, Object> usermap = new HashMap<String,Object>();
 
                     for (final String uid : userids) {
+
+                        //get usernames
+                        /*
+                        final Map<String, Object> usermap = new HashMap<String,Object>();
+
                         db.collection("User").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -83,6 +90,10 @@ public class BorrowFragment extends Fragment {
                                 usermap.put(uid,username);
                             }
                         });
+                        */
+
+                        //initial page booklist add
+
                         db.collection("User").document(uid).collection("Lend")
                                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -95,8 +106,10 @@ public class BorrowFragment extends Fragment {
                                     map.put("title", document.getString("title"));
                                     map.put("ISBN", document.getString("isbn"));
 
-                                    map.put("owner", usermap.get(uid));
-                                    //map.put("owner",ownerusername);
+                                    //get id for now, should be fix to username later
+
+                                    map.put("owner", document.getString("owner"));
+
                                     map.put("status", document.getString("status"));
 
                                     booklist.add(map);
@@ -110,36 +123,11 @@ public class BorrowFragment extends Fragment {
                         });
                     }
 
-                    if (userids.size() == 0){Log.e("length","0");}
-
-                    Log.e("adduser", "adddone");
-
                 } else {
                     Log.d("Retrieve Data", "Fail");
                 }
             }
         });
-
-        //get usernames
-
-        final List<Map<String, Object>> usernamelist = new ArrayList<Map<String, Object>>();
-
-        for (final String uid : userids) {
-            db.collection("User").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    String username = task.getResult().getString("Name");
-                    Map<String, Object> usermap = new HashMap<String, Object>();
-                    usermap.put("Username",username);
-                    usermap.put("Userid",uid);
-                    usernamelist.add(usermap);
-                }
-            });
-        }
-
-        if (userids.size() == 0){Log.e("length","0");}
-
-        //initial stage
 
         //get search content
 
@@ -161,6 +149,8 @@ public class BorrowFragment extends Fragment {
 
 
                 for (String uid : userids) {
+                    //if content is empty show nothing
+
                     if (search_content.equals("")){
                         booklist.clear();
                         searchAdapter = new SearchListViewAdapter(getContext(),booklist);
@@ -168,10 +158,7 @@ public class BorrowFragment extends Fragment {
                         break;
                     };
 
-                    Log.e("user", uid);
-                    Log.e("for", "for start");
-
-                    Log.e("searchcontent", search_content);
+                    //search
 
                     db.collection("User").document(uid).collection("Lend")
                             .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -205,6 +192,8 @@ public class BorrowFragment extends Fragment {
                                             booklist.add(map);
                                         }
 
+                                        //upadate booklist
+
                                         searchAdapter = new SearchListViewAdapter(getContext(),booklist);
                                         searchList.setAdapter(searchAdapter);
 
@@ -216,6 +205,7 @@ public class BorrowFragment extends Fragment {
 
                 }
 
+                //clear the search text after the search
 
                 searchEditText.setText("");
 
@@ -225,54 +215,6 @@ public class BorrowFragment extends Fragment {
 
 
         return root;
-    }
-
-    public void setbook(){
-        Log.e("setbook","start");
-
-        for (String uid : userids) {
-            Log.e("forstart", "1");
-            Log.e("user", uid);
-
-
-            db.collection("User").document(uid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    ownerusername = task.getResult().getString("Name");
-                }
-            });
-
-
-            db.collection("User").document(uid).collection("Lend")
-                    .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    Log.e("addbook", "add");
-
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-
-                        Log.e("book", document.getString("title"));
-
-                        Map<String, Object> map = new HashMap<String, Object>();
-                        map.put("author", document.getString("author"));
-                        map.put("title", document.getString("title"));
-                        map.put("ISBN", document.getString("isbn"));
-
-                        map.put("owner", ownerusername);
-                        map.put("status", document.getString("status"));
-
-
-                        booklist.add(map);
-
-                    }
-
-                    searchAdapter = new SearchListViewAdapter(getContext(), booklist);
-                    searchList.setAdapter(searchAdapter);
-
-                    searchEditText.setText("");
-                }
-            });
-        }
     }
     
 }
