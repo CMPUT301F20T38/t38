@@ -1,23 +1,41 @@
 package com.example.booker.data;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.example.booker.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SearchListViewAdapter extends BaseAdapter {
-
+    final String TAG = "borrow/search list tag";
     private List<Map<String, Object>> bookList;
     private LayoutInflater layoutInflater;
+    private Button request_button;
     private Context context;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private Map<String, Object> null_field;//in order to create a document with null field
 
     public SearchListViewAdapter(Context context, List<Map<String, Object>> bookList) {
         this.bookList = bookList;
@@ -37,7 +55,7 @@ public class SearchListViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        Log.d("BOOOK SIZE", bookList.toString());
+        Log.d("BOOK SIZE", bookList.toString());
         return bookList.size();
     }
 
@@ -78,6 +96,86 @@ public class SearchListViewAdapter extends BaseAdapter {
         component.ISBN.setText("ISBN: "+(String)bookList.get(i).get("ISBN"));
         component.ownerName.setText("owner:"+(String)bookList.get(i).get("owner"));
         component.status.setText("status:"+(String)bookList.get(i).get("status"));
+
+        //set the request button reaction
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        request_button = view.findViewById(R.id.request_button);
+        final int where = i;
+        null_field = new HashMap<>();
+        null_field.put("nothing","");
+        request_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //add the book to the borrowed books of current user
+                db.collection("User").document(mAuth.getCurrentUser()
+                        .getUid()).collection("Borrowed").document(bookList.get(where).get("title").toString())
+                        .set(bookList.get(where))
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "DocumentSnapshot successfully written!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error writing document", e);
+                            }
+                        });
+                //update status in borrower borrowed page - requested
+                db.collection("User").document(mAuth.getCurrentUser()
+                        .getUid()).collection("Borrowed").document(bookList.get(where).get("title").toString())
+                        .update("status","requested")
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "Borrowed status changed successfully!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Borrowed status failed", e);
+                            }
+                        });
+                //get username of the borrower and add to owner's request list
+                db.collection("User").document(mAuth.getCurrentUser()
+                        .getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        final String borrower_name = documentSnapshot.getString("Name");
+                        Log.e("================================",borrower_name+bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
+                        //add to owner request list
+                        db.collection("User")
+                                .document(bookList.get(where).get("owner").toString()).collection("Lend")
+                                .document(bookList.get(where).get("title").toString()).collection("Requests")
+                                .document(borrower_name).set(null_field)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.e(TAG,"Successfully add username to request list");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.e(TAG,"failed to add username to request list");
+                                    }
+                                });
+                    }
+                })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e(TAG,"failed to add username to request list");
+                            }
+                        });
+                Toast.makeText(context,"Thank you for request, please wait for response.",Toast.LENGTH_SHORT);
+
+
+            }
+        });
 
         return view;
     }
