@@ -49,7 +49,6 @@ public class LendFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseUser user;
     private ArrayList<Book> bookList;
-    private boolean firstLoadPage;
     private String selectBookTitle;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -58,7 +57,6 @@ public class LendFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
-        final String userId = user.getUid();
         btnAdd = (Button) root.findViewById(R.id.owner_book_add);
         ownerList = (ListView) root.findViewById(R.id.owner_book_list);
 
@@ -93,32 +91,24 @@ public class LendFragment extends Fragment {
         });
 
         //For test
-        DocumentReference useTest = db.collection("User").document(userId);
-        useTest.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    DocumentSnapshot test = task.getResult();
-                    Log.d("User Name", test.get("Name").toString());
-            }
-        });
 
 
-        if (userId != null) {
-
+        if (user != null) {
+            final String userId = user.getUid();
             CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
             collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
                 @Override
                 public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                     bookList.clear();
                     Log.d("AddSnapshotListener", "Notify Data changed");
-
-                    for (DocumentSnapshot documentSnapshot : value) {
-                        Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
-                                documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
-                        bookList.add(book);
-                        Log.d(documentSnapshot.get("title").toString(), "added");
+                    if (value != null) {
+                        for (DocumentSnapshot documentSnapshot : value) {
+                            Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
+                                    documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
+                            bookList.add(book);
+                            Log.d(documentSnapshot.get("title").toString(), "added");
+                        }
                     }
-
                     ownerAdapter.notifyDataSetChanged();
                     Log.d("Owner Adapter", "Loaded");
                 }

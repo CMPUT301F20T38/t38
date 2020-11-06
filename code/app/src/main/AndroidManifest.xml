@@ -29,21 +29,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activities.ChangeProfile"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".activities.UserSignUp"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".activities.UserLogin"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".activities.AddOwnerBook"
-            android:parentActivityName=".MainActivity" />
 
-        <activity android:name=".activities.EditDeleteOwnerBook"
-            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".activities.ChangeProfile">
+
+        </activity>
+
+        <activity
+            android:name=".activities.UserSignUp" >
+
+        </activity>
+
+        <activity
+            android:name=".activities.UserLogin">
+
+        </activity>
+
+        <activity
+            android:name=".activities.AddOwnerBook">
+
+        </activity>
+
+        <activity
+            android:name=".activities.EditDeleteOwnerBook">
+
+        </activity>
 
     </application>
 

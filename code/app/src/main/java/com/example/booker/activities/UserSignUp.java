@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.booker.R;
-import com.example.booker.ui.profile.ProfileViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -84,6 +83,7 @@ public class UserSignUp extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+                    Log.d("Sign up", "Good");
                     FirebaseUser user = mAuth.getCurrentUser();
                     HashMap<String, String> data = new HashMap<>();
 
@@ -113,7 +113,7 @@ public class UserSignUp extends AppCompatActivity {
 
                 }
                 else {
-
+                    Log.d("Sign up", "Fail");
                     // For Test, Delete before submit -- Yee Lin
                     Toast.makeText(getApplicationContext(), "Bad", Toast.LENGTH_LONG).show();
                 }
