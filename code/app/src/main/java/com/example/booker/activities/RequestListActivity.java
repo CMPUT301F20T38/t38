@@ -27,6 +27,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * RequestListActivity is the activity for the request in owner lend page
+ * It is inside of the lend page, after click on specific book, there's a show requests
+ * it shows all request from other users who want to borrow the book
+ */
 public class RequestListActivity extends AppCompatActivity {
     final String TAG = "owner requests tag";
     private ListView request_list;

@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.example.booker.R;
+import com.example.booker.ui.borrow.BorrowFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -107,71 +108,76 @@ public class SearchListViewAdapter extends BaseAdapter {
         request_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //add the book to the borrowed books of current user
-                db.collection("User").document(mAuth.getCurrentUser()
-                        .getUid()).collection("Borrowed").document(bookList.get(where).get("title").toString())
-                        .set(bookList.get(where))
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "DocumentSnapshot successfully written!");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error writing document", e);
-                            }
-                        });
-                //update status in borrower borrowed page - requested
-                db.collection("User").document(mAuth.getCurrentUser()
-                        .getUid()).collection("Borrowed").document(bookList.get(where).get("title").toString())
-                        .update("status","requested")
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "Borrowed status changed successfully!");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Borrowed status failed", e);
-                            }
-                        });
-                //get username of the borrower and add to owner's request list
-                db.collection("User").document(mAuth.getCurrentUser()
-                        .getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        final String borrower_name = documentSnapshot.getString("Name");
-                        Log.e("================================",borrower_name+bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
-                        //add to owner request list
-                        db.collection("User")
-                                .document(bookList.get(where).get("owner").toString()).collection("Lend")
-                                .document(bookList.get(where).get("title").toString()).collection("Requests")
-                                .document(borrower_name).set(null_field)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.e(TAG,"Successfully add username to request list");
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e(TAG,"failed to add username to request list");
-                                    }
-                                });
-                    }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG,"failed to add username to request list");
-                            }
-                        });
-                Toast.makeText(context,"Thank you for request, please wait for response.",Toast.LENGTH_SHORT);
+                if(mAuth.getCurrentUser()==null){//check if the user's already logged in
+                    Toast.makeText(view.getContext(), "Please log in first!", Toast.LENGTH_SHORT).show();
+                }else{
+                    //add the book to the borrowed books of current user
+                    db.collection("User").document(mAuth.getCurrentUser()
+                            .getUid()).collection("Borrowed").document(bookList.get(where).get("title").toString())
+                            .set(bookList.get(where))
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "DocumentSnapshot successfully written!");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error writing document", e);
+                                }
+                            });
+                    //update status in borrower borrowed page - requested
+                    db.collection("User").document(mAuth.getCurrentUser()
+                            .getUid()).collection("Borrowed").document(bookList.get(where).get("title").toString())
+                            .update("status","requested")
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "Borrowed status changed successfully!");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Borrowed status failed", e);
+                                }
+                            });
+                    //get username of the borrower and add to owner's request list
+                    db.collection("User").document(mAuth.getCurrentUser()
+                            .getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            final String borrower_name = documentSnapshot.getString("Name");
+                            Log.e("================================",borrower_name+bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
+                            //add to owner request list
+                            db.collection("User")
+                                    .document(bookList.get(where).get("owner").toString()).collection("Lend")
+                                    .document(bookList.get(where).get("title").toString()).collection("Requests")
+                                    .document(borrower_name).set(null_field)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.e(TAG,"Successfully add username to request list");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e(TAG,"failed to add username to request list");
+                                        }
+                                    });
+                        }
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG,"failed to add username to request list");
+                                }
+                            });
+                    Toast.makeText(view.getContext(),"Thank you for request, please wait for response.",Toast.LENGTH_SHORT);
+                }
+
 
 
             }
