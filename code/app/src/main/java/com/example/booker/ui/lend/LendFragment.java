@@ -41,6 +41,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  Yee's Part
+ *  The second fragment of the main activity named Lend
+ *  Button btnAdd: clickable Button which jump to AddOwnerBook activity
+ *
+ *  Add Button onClicklistener: Execute add book activity if there is an user loginning
+ *  ListView onItemClickListener: When the item in list view, navigate to the edit and delete book activity
+ *
+ */
+
+
 public class LendFragment extends Fragment {
 
     private Button btnAdd;
@@ -64,6 +75,7 @@ public class LendFragment extends Fragment {
         ownerAdapter = new OwnerListViewAdapter(getContext(), bookList);
         ownerList.setAdapter(ownerAdapter);
 
+        // When the item in list view is trigger, navigate to the edit or delete book activity
         ownerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -75,6 +87,7 @@ public class LendFragment extends Fragment {
             }
         });
 
+        // When the button is trigger, navigate to the new book activity
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,8 +102,6 @@ public class LendFragment extends Fragment {
                 }
             }
         });
-
-        //For test
 
 
         if (user != null) {
@@ -118,6 +129,12 @@ public class LendFragment extends Fragment {
 
         return root;
     }
+
+    /*
+        The method of exctuion depends on the return result
+        if result code is equal to 0, update book
+        if result code is equal to 1, delete book
+     */
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
