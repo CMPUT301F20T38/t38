@@ -138,7 +138,7 @@ public class ChangeProfile extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable editable) {
-     
+
         }
     };
 }
