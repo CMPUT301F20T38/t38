@@ -116,43 +116,6 @@ public class BorrowFragment extends Fragment {
 
                     if (userids.size() == 0){Log.e("length","0");}
 
-                    //initial stage
-                    /*
-                    for (final String uid : userids) {
-                        Log.e("Initial stage", uid);
-                        db.collection("User").document(uid).collection("Lend")
-                                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-
-
-
-                                    String thisauthor = document.getString("author");
-                                    String thistitle = document.getString("title");
-                                    String thisISBN = document.getString("isbn");
-                                    String thisstatus = document.getString("status");
-
-                                    Map<String, Object> map = new HashMap<String, Object>();
-                                    map.put("author", document.getString("author"));
-                                    map.put("title", document.getString("title"));
-                                    map.put("ISBN", document.getString("isbn"));
-
-                                    map.put("owner", usermap.get(uid));
-                                    //map.put("owner",ownerusername);
-                                    map.put("status", document.getString("status"));
-
-                                    booklist.add(map);
-                                }
-
-                                searchAdapter = new SearchListViewAdapter(getContext(), booklist);
-                                searchList.setAdapter(searchAdapter);
-                            }
-
-
-                        });
-                    }*/
                     Log.e("adduser", "adddone");
 
                 } else {
