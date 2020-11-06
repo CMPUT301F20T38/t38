@@ -1,5 +1,9 @@
 package com.example.booker.data;
 
+/**
+ * Request class is used for owner book request list
+ * It stores data of each request
+ */
 public class Request {
     private String user_name;
     private String book_name;
