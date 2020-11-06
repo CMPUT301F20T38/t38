@@ -17,6 +17,11 @@ import com.example.booker.R;
 
 import java.util.ArrayList;
 
+/**
+ * BorrowedBooksList class is the adapter for Borrowed Book List, the function of it
+ * is to customize the Borrowed Book list view and decide the buttons pattern
+ * for each status
+ */
 public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks> {
     private ArrayList<BorrowedBooks> borrowedBooks;
     private Context context;
