@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -61,7 +62,8 @@ public class RequestList extends ArrayAdapter<Request> {
         TextView request_accept = view.findViewById(R.id.request_accept);
         TextView request_decline = view.findViewById(R.id.request_decline);
 
-        request_username.setText(request.getUser_name());
+        String username = db.collection("User").document(request.getUser_name()).get().getResult().get("Name").toString();
+        request_username.setText(username);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -73,9 +75,11 @@ public class RequestList extends ArrayAdapter<Request> {
                 final CollectionReference collectionReference = db.collection("User")
                         .document(mAuth.getCurrentUser().getUid()).collection("Lend")
                         .document(request.getBook_name()).collection("Requests");
+                DocumentReference owner_path = db.collection("User").document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend").document(request.getBook_name());
                 //change book status for owner
-                db.collection("User").document(mAuth.getCurrentUser().getUid())
-                        .collection("Lend").document(request.getBook_name()).update("status","accepted");
+                owner_path.update("status","accepted");
+                owner_path.update("requests", FieldValue.arrayRemove());
 
 /*                //change borrow status for accepted user
                 db.collection("User").get()
@@ -148,9 +152,9 @@ public class RequestList extends ArrayAdapter<Request> {
 */
 
                 //delete all documents in Request collection
-                for(int i=requests.size()-1; i>=0; i--){
+                /*for(int i=requests.size()-1; i>=0; i--){
                     collectionReference.document(requests.get(i).getUser_name()).delete();
-                }
+                }*/
 
             }
         });
@@ -196,7 +200,8 @@ public class RequestList extends ArrayAdapter<Request> {
                             }
                         });
 */
-                collectionReference.document(requests.get(position).getUser_name()).delete();
+                //delete the whole doc
+                /*collectionReference.document(requests.get(position).getUser_name()).delete();*/
             }
         });
 

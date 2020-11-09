@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -149,12 +150,11 @@ public class SearchListViewAdapter extends BaseAdapter {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             final String borrower_name = documentSnapshot.getString("Name");
-                            Log.e("================================",borrower_name+bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
+                            Log.e("================================",documentSnapshot.getId()+bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
                             //add to owner request list
                             db.collection("User")
                                     .document(bookList.get(where).get("owner").toString()).collection("Lend")
-                                    .document(bookList.get(where).get("title").toString()).collection("Requests")
-                                    .document(borrower_name).set(null_field)
+                                    .document(bookList.get(where).get("title").toString()).update("requests", FieldValue.arrayUnion(mAuth.getCurrentUser().getUid()))
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {

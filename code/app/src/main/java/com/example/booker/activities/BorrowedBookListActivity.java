@@ -39,7 +39,7 @@ import java.util.List;
 
 /**
  * The borrowed book list is a list of books that user borrowed or requested
- * It contains the specific user's all borrowed books 
+ * It contains the specific user's all borrowed books
  */
 public class BorrowedBookListActivity extends AppCompatActivity {
     final String TAG = "borrowed book tag";
