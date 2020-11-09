@@ -1,5 +1,7 @@
 package com.example.booker.data;
 
+import java.util.ArrayList;
+
 /**
  * Request class is used for owner book request list
  * It stores data of each request
