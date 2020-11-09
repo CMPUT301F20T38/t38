@@ -59,19 +59,19 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks> {
         borrowed_status.setText(borrowedBook.getStatus());
         borrowed_owner_username.setText(borrowedBook.getOwner());
         //set the button change and visibility of map
-        if(borrowedBook.getStatus().equals("borrowed")){//borrowed
-            accept_book.setVisibility(View.GONE);
-            return_book.setVisibility(View.VISIBLE);
-            map_img.setVisibility(View.INVISIBLE);
-        }else if (borrowedBook.getStatus().equals("accepted")){//accepted
-            accept_book.setVisibility(View.VISIBLE);
-            return_book.setVisibility(View.GONE);
-            map_img.setVisibility(View.VISIBLE);
-        }else{//requested, but not accept
-            accept_book.setVisibility(View.GONE);
-            return_book.setVisibility(View.GONE);
-            map_img.setVisibility(View.GONE);
-        }
+//        if(borrowedBook.getStatus().equals("borrowed")){//borrowed
+//            accept_book.setVisibility(View.GONE);
+//            return_book.setVisibility(View.VISIBLE);
+//            map_img.setVisibility(View.INVISIBLE);
+//        }else if (borrowedBook.getStatus().equals("accepted")){//accepted
+//            accept_book.setVisibility(View.VISIBLE);
+//            return_book.setVisibility(View.GONE);
+//            map_img.setVisibility(View.VISIBLE);
+//        }else{//requested, but not accept
+//            accept_book.setVisibility(View.GONE);
+//            return_book.setVisibility(View.GONE);
+//            map_img.setVisibility(View.GONE);
+//        }
 
         return view;
     }

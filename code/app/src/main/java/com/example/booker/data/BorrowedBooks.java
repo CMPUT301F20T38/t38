@@ -12,7 +12,7 @@ public class BorrowedBooks extends Book{
         this.src = src;
     }
 
-    public BorrowedBooks(){}
+    public BorrowedBooks(String author, String title, String isbn, String status, String owner, String borrow){}
 
     public String getSrc() {
         return src;
