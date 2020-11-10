@@ -83,7 +83,7 @@ public class LendFragment extends Fragment {
                 selectBookTitle = book.getTitle();
                 Intent intent = new Intent(view.getContext(), EditDeleteOwnerBook.class);
                 intent.putExtra("YeeSkywalker", book);
-                startActivityForResult(intent, 0);
+                startActivity(intent);
             }
         });
 
@@ -129,76 +129,4 @@ public class LendFragment extends Fragment {
 
         return root;
     }
-
-    /*
-        The method of exctuion depends on the return result
-        if result code is equal to 0, update book
-        if result code is equal to 1, delete book
-     */
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        String userId = user.getUid();
-        CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
-
-        if (requestCode == 0){
-            if (resultCode == 0) {
-                final Book book = (Book) data.getSerializableExtra("YeeSkywalker");
-                collectionReference
-                        .document(selectBookTitle)
-                        .delete()
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(selectBookTitle, "Exhaust");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(selectBookTitle, "Exhaust Fail");
-                            }
-                        });
-
-                collectionReference
-                        .document(book.getTitle())
-                        .set(book)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(book.getTitle(), "Add");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(book.getTitle(), "Not Add");
-                            }
-                        });
-
-            }
-
-            if (resultCode == 1) {
-                final Book book = (Book) data.getSerializableExtra("YeeSkywalker");
-                collectionReference
-                        .document(book.getTitle())
-                        .delete()
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(book.getTitle(), "Delete");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(book.getTitle(), "Delete Fail");
-                            }
-                        });
-            }
-        }
-    }
-
-
-
 }
