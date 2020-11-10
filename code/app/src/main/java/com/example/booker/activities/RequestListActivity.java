@@ -19,6 +19,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -26,6 +28,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * RequestListActivity is the activity for the request in owner lend page
@@ -38,6 +42,7 @@ public class RequestListActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private ArrayList<Request> requestList;
+    private ArrayList<String> request_users;
     private ArrayAdapter<Request> requestAdapter;
     private String book_name;
     private TextView return_button, request_accept, request_decline;
@@ -57,53 +62,52 @@ public class RequestListActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         book_name = getIntent().getStringExtra("BookName");
-        Log.e("bookname++++++++++++++++++",book_name);
 
-        //change the path of the book(document) here in later coding
-        final CollectionReference collectionReference = db.collection("User")
-                .document(mAuth.getCurrentUser().getUid()).collection("Lend")
-                .document(book_name).collection("Requests");
+        //find the path to the owner of the book, and go into lend branch
+        final DocumentReference documentReference = db.collection("User")
+                .document(mAuth.getCurrentUser().getUid()).collection("Lend").document(book_name);
 
 
-        //get each request for each book
-        collectionReference
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                requestList.add(new Request(document.getId(),book_name));
-                                //Log.e(TAG, "added");
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
-                        }
+        //get requests array for each book
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                //get each element in requests field and add them to list
+                request_users = (ArrayList<String>) task.getResult().get("requests");
+                if(request_users!=null){
+                    for(int m=0; m<request_users.size(); m++) {
+                        requestList.add(new Request(request_users.get(m), book_name));
                     }
-                });
+                }
+
+            }
+        });
         requestAdapter = new RequestList(this, requestList);
         request_list.setAdapter(requestAdapter);
 
         //real-time change
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>(){
+        documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+            public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
                 requestList.clear();
-
-                for(QueryDocumentSnapshot doc: queryDocumentSnapshots){
-                    String user_name = (String)doc.getId();
-                    requestList.add(new Request(user_name,book_name));
+                request_users = (ArrayList<String>) snapshot.get("requests");
+                if(request_users!=null){
+                    for(int m=0; m<request_users.size(); m++) {
+                        requestList.add(new Request(request_users.get(m), book_name));
+                    }
                 }
-                requestAdapter.notifyDataSetChanged();
+
             }
+
+
         });
 
 
-        return_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+                return_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                    }
+                });
     }
 }
