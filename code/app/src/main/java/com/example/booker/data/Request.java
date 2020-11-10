@@ -5,6 +5,8 @@ import java.util.ArrayList;
 /**
  * Request class is used for owner book request list
  * It stores data of each request
+ * username is not real username, instead it's a hash value
+ * book_name is used for finding path for correspond book
  */
 public class Request {
     private String user_name;

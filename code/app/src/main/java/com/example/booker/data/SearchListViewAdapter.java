@@ -150,7 +150,7 @@ public class SearchListViewAdapter extends BaseAdapter {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             final String borrower_name = documentSnapshot.getString("Name");
-                            Log.e("================================",documentSnapshot.getId()+bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
+                            //Log.e("================================",documentSnapshot.getId()+bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
                             //add to owner request list
                             db.collection("User")
                                     .document(bookList.get(where).get("owner").toString()).collection("Lend")

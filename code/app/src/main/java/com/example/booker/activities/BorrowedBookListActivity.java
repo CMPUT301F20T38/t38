@@ -201,7 +201,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                                     });
                         }
                        dialogInterface.dismiss();//return from dialog
-                        borrowedBooksAdapter.notifyDataSetChanged();
+
                     }
                 });
                 builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
@@ -210,6 +210,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                         //do nothing
                     }
                 });
+                borrowedBooksAdapter.notifyDataSetChanged();
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
