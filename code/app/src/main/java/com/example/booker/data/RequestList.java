@@ -1,6 +1,7 @@
 package com.example.booker.data;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.booker.R;
+import com.example.booker.activities.MapsActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,6 +23,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -57,27 +61,43 @@ public class RequestList extends ArrayAdapter<Request> {
 
         final Request request = requests.get(position);
 
-        TextView request_username = view.findViewById(R.id.request_username);
+        final TextView request_username = view.findViewById(R.id.request_username);
         TextView request_accept = view.findViewById(R.id.request_accept);
         TextView request_decline = view.findViewById(R.id.request_decline);
 
-        request_username.setText(request.getUser_name());
+
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        db.collection("User").document(request.getUser_name()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    String username = task.getResult().get("Name").toString();
+                    request_username.setText(username);
+                }else{
+                    Log.d(TAG, "Fail to find user col/doc!");
+                }
+
+
+            }
+        });
+
         //accept, accept the current user and decline all other users
         request_accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //find the path to the correspond Request
-                final CollectionReference collectionReference = db.collection("User")
+                final DocumentReference documentRef = db.collection("User")
                         .document(mAuth.getCurrentUser().getUid()).collection("Lend")
-                        .document(request.getBook_name()).collection("Requests");
+                        .document(request.getBook_name());
+                DocumentReference owner_path = db.collection("User").document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend").document(request.getBook_name());
                 //change book status for owner
-                db.collection("User").document(mAuth.getCurrentUser().getUid())
-                        .collection("Lend").document(request.getBook_name()).update("status","accepted");
+                owner_path.update("status","accepted");
+                owner_path.update("requests", FieldValue.arrayRemove());
 
-/*                //change borrow status for accepted user
+                //change borrow status for accepted user
                 db.collection("User").get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -85,9 +105,8 @@ public class RequestList extends ArrayAdapter<Request> {
                                 if(task.isSuccessful()){
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         //find a matched name, update the status of its borrowed book
-                                        if(document.get("Name").equals(requests.get(position).getUser_name())){
-                                            //the book name path here will be changed later
-                                            //may have some issue in get field here???
+                                        if(document.getId().equals(request.getUser_name())){
+                                            //change status to accepted
                                             db.collection("User").document(document.getId()).collection("Borrowed")
                                                     .document(request.getBook_name()).update("status","accepted")
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -109,9 +128,12 @@ public class RequestList extends ArrayAdapter<Request> {
                                 }
                             }
                         });
-                //update status for other users
+                //update status for other users, loop all users
                 for(int i=0; i<requests.size(); i++){
+                    //when the user is not the accepted one
+
                     if(i != position){
+                        final int where = i;
                         db.collection("User").get()
                                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                     @Override
@@ -119,14 +141,16 @@ public class RequestList extends ArrayAdapter<Request> {
                                         if(task.isSuccessful()){
                                             for (QueryDocumentSnapshot document : task.getResult()) {
                                                 //find a matched name, update the status of its borrowed book
-                                                if(document.get("Name").equals(requests.get(i).getUser_name())){
-                                                    //the book name path here will be changed later, path will change here ???
-                                                    //if decline a request, than for the user trying to borrow the book, it will disappear and send notification
+                                                if(document.getId().equals(requests.get(where).getUser_name())){
+                                                    //if decline a request, then for the user trying to borrow the book, it will disappear and send notification
+                                                    //delete the correspond book in borrower's borrowed list
                                                     db.collection("User").document(document.getId()).collection("Borrowed")
                                                             .document(request.getBook_name()).delete()
                                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                 @Override
                                                                 public void onSuccess(Void aVoid) {
+
+                                                                    //notification code write here
                                                                     Log.d(TAG, "Correspond user accept status successfully updated!");
                                                                 }
                                                             })
@@ -145,34 +169,45 @@ public class RequestList extends ArrayAdapter<Request> {
                                 });
                     }
                 }
-*/
 
-                //delete all documents in Request collection
-                for(int i=requests.size()-1; i>=0; i--){
-                    collectionReference.document(requests.get(i).getUser_name()).delete();
-                }
+
+
+                //delete all elements in Request array(update request list array) ???
+                documentRef.update("requests",null).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Log.d(TAG, "Remove all users successfully! ");
+                        }else{
+                            Log.d(TAG, "Fail to remove all users!");
+                        }
+                    }
+                });
+
+                Intent intent = new Intent(context, MapsActivity.class);
+                context.startActivity(intent);
 
             }
         });
-        //decline, decline correspond user
+        // decline correspond single user
         request_decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mAuth = FirebaseAuth.getInstance();
                 db = FirebaseFirestore.getInstance();
                 //the document path for book will be change later
-                final CollectionReference collectionReference = db.collection("User")
+                final DocumentReference documentRef = db.collection("User")
                         .document(mAuth.getCurrentUser().getUid()).collection("Lend")
-                        .document(request.getBook_name()).collection("Requests");
-/*                db.collection("User").get()
+                        .document(request.getBook_name());
+                //get correspond user name
+                db.collection("User").get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if(task.isSuccessful()){
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         //find a matched name, update the status of its borrowed book
-                                        if(document.get("Name").equals(requests.get(position).getUser_name())){
-                                            //the book name path here will be changed later, path will change here ???
+                                        if(document.getId().equals(requests.get(position).getUser_name())){
                                             //if decline a request, than for the user trying to borrow the book, it will disappear and send notification
                                             db.collection("User").document(document.getId()).collection("Borrowed")
                                                     .document(request.getBook_name()).delete()
@@ -195,8 +230,17 @@ public class RequestList extends ArrayAdapter<Request> {
                                 }
                             }
                         });
-*/
-                collectionReference.document(requests.get(position).getUser_name()).delete();
+                //delete the correspond item in array
+                documentRef.update("request",FieldValue.arrayRemove(request.getUser_name())).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull  Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Log.d(TAG, "Remove single user successfully! ");
+                        }else{
+                            Log.d(TAG, "Fail to remove single user!");
+                        }
+                    }
+                });
             }
         });
 

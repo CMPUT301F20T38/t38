@@ -11,16 +11,16 @@
         android:layout_weight="1"
         android:textSize="25dp"
         android:text="UserName"/>
-
-    <Button
+    <TextView
         android:id="@+id/request_accept"
+        android:layout_margin="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="ACCEPT"
-        android:textColor="#00ff00"
         android:textSize="20dp"
-        android:textStyle="bold" />
+        android:text="ACCEPT"
+        android:textStyle="bold"
+        android:textColor="#00ff00"
+        />
     <TextView
         android:id="@+id/request_decline"
         android:layout_margin="10dp"
