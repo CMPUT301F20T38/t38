@@ -49,6 +49,7 @@
 
         </activity>
 
+
         <activity
             android:name=".activities.UserLogin">
 
@@ -57,15 +58,19 @@
         <activity
             android:name=".activities.AddOwnerBook">
 
+
+
         </activity>
+
+        <activity
+            android:name=".activities.MapsActivity"
+            android:label="Maps"></activity>
+
 
         <activity
             android:name=".activities.EditDeleteOwnerBook">
 
         </activity>
-        <activity
-            android:name=".activities.MapsActivity"
-            android:label="Maps"></activity>
 
     </application>
 
