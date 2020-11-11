@@ -1,6 +1,7 @@
 package com.example.booker.data;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.booker.R;
+import com.example.booker.activities.MapsActivity;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,6 +33,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+import static androidx.constraintlayout.motion.widget.Debug.getLocation;
+
 /**
  * RequestList class is the adapter for request list, the function of it
  * is to customize the request list view and add click event on the
@@ -41,6 +46,9 @@ public class RequestList extends ArrayAdapter<Request> {
     private Context context;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+
+    private String borrower;
+
 
     public RequestList(@NonNull Context context, @NonNull ArrayList<Request> requests) {
         super(context, 0, requests);
@@ -87,10 +95,13 @@ public class RequestList extends ArrayAdapter<Request> {
             public void onClick(View view) {
                 //find the path to the correspond Request
                 final DocumentReference documentRef = db.collection("User")
-                        .document(mAuth.getCurrentUser().getUid()).collection("Lend")
+                        .document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend")
                         .document(request.getBook_name());
-                DocumentReference owner_path = db.collection("User").document(mAuth.getCurrentUser().getUid())
-                        .collection("Lend").document(request.getBook_name());
+                DocumentReference owner_path = db.collection("User")
+                        .document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend")
+                        .document(request.getBook_name());
                 //change book status for owner
                 owner_path.update("status","accepted");
                 owner_path.update("requests", FieldValue.arrayRemove());
@@ -119,6 +130,26 @@ public class RequestList extends ArrayAdapter<Request> {
                                                             Log.d(TAG, "Correspond user accept status failed to updated!");
                                                         }
                                                     });
+//
+//                                            db.collection("trans").document(document.getId())
+//                                                    .set(request.getBook_name())
+//                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                                        @Override
+//                                                        public void onSuccess(Void aVoid) {
+//                                                            // These are a method which gets executed when the task is succeeded
+//                                                            Log.d(TAG, "trans: Data has been added successfully!");
+//                                                        }
+//                                                    })
+//                                                    .addOnFailureListener(new OnFailureListener() {
+//                                                        @Override
+//                                                        public void onFailure(@NonNull Exception e) {
+//                                                            // These are a method which gets executed if there’s any problem
+//                                                            Log.d(TAG, "trans: Data could not be added!" + e.toString());
+//                                                        }
+//                                                    });
+
+
+
                                         }
                                     }
                                 }else{
@@ -179,44 +210,6 @@ public class RequestList extends ArrayAdapter<Request> {
                                 });
                     }
                 }
-/*                for(int i=0; i<requests.size(); i++){
-                    //when the user is not the accepted one
-                    if(i != position){
-                        final int where = i;
-                        db.collection("User").get()
-                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if(task.isSuccessful()){
-                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                //find a matched name, update the status of its borrowed book
-                                                if(document.getId().equals(requests.get(where).getUser_name())){
-                                                    //if decline a request, then for the user trying to borrow the book, it will disappear and send notification
-                                                    //delete the correspond book in borrower's borrowed list
-                                                    db.collection("User").document(document.getId()).collection("Borrowed")
-                                                            .document(request.getBook_name()).delete()
-                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-
-                                                                    //notification code write here
-                                                                    Log.d(TAG, "Correspond user accept status successfully updated!");
-                                                                }
-                                                            })
-                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    Log.d(TAG, "Correspond user accept status failed to updated!");
-                                                                }
-                                                            });
-                                                }
-                                            }
-                                        }else{
-                                            Log.d(TAG, "Fail to find user col/doc!");
-                                        }
-                                    }
-                                });
-                    }*/
 
 
                 //delete all elements in Request array(update request list array) ???
@@ -230,6 +223,64 @@ public class RequestList extends ArrayAdapter<Request> {
                         }
                     }
                 });
+
+
+
+
+//                documentRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            // Document found in the offline cache
+//                            DocumentSnapshot document = task.getResult();
+//                            borrower = document.getString("borrower");
+//                            Log.d(TAG, "Cached document data: " + document.getData());
+//                            Log.d(TAG, "Cached document data: " + borrower);
+//                            Log.d(TAG, "inside borrower: " + borrower);
+//
+//
+//                        } else {
+//                            Log.d(TAG, "Cached get failed: ", task.getException());
+//                        }
+//                    }
+//                });
+
+//                db.collection("trans")
+//                        .document(request.getBook_name())
+//                        .set(mAuth.)
+//                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                // These are a method which gets executed when the task is succeeded
+//                                Log.d(TAG, "Data has been added successfully!");
+//                            }
+//                        })
+//                        .addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                // These are a method which gets executed if there’s any problem
+//                                Log.d(TAG, "Data could not be added!" + e.toString());
+//                            }
+//                        });
+
+
+
+                Intent mapIntent = new Intent(context, MapsActivity.class);
+
+
+                mapIntent.putExtra("bookName", request.getBook_name());
+                Log.d(TAG, "putExtra: Borrower:"+request.getBook_name());
+
+//                mapIntent.putExtra("lenderName", request.getUser_name());
+//                Log.d(TAG, "putExtra: Borrower:"+request.getUser_name());
+
+                mapIntent.putExtra("borrowerName", request.getUser_name());
+                Log.d(TAG, "putExtra: Borrower:"+request.getUser_name());
+
+
+
+
+                context.startActivity(mapIntent);
 
 
             }

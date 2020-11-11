@@ -7,9 +7,11 @@ package com.example.booker.data;
 public class BorrowedBooks extends Book{
     private String src;
 
+
     public BorrowedBooks(String author, String title, String ISBN, String status, String owner, String borrower, String src) {
         super(author, title, ISBN, status, owner, borrower);
         this.src = src;
+
     }
 
     public BorrowedBooks(){}
@@ -17,5 +19,7 @@ public class BorrowedBooks extends Book{
     public String getSrc() {
         return src;
     }
+
+
 
 }

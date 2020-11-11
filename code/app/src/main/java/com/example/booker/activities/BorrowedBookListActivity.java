@@ -150,6 +150,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                                                     }
                                                     Log.d(TAG, document.getId() + " => " + document.getData());
                                                 }
+                                                borrowedBooksAdapter.notifyDataSetChanged();
                                             } else {
                                                 Log.d(TAG, "Error getting documents: ", task.getException());
                                             }
@@ -174,6 +175,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                                                     }
                                                     Log.d(TAG, document.getId() + " => " + document.getData());
                                                 }
+                                                borrowedBooksAdapter.notifyDataSetChanged();
                                             } else {
                                                 Log.d(TAG, "Error getting documents: ", task.getException());
                                             }
@@ -194,6 +196,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
 
                                                     Log.d(TAG, document.getId() + " => " + document.getData());
                                                 }
+                                                borrowedBooksAdapter.notifyDataSetChanged();
                                             } else {
                                                 Log.d(TAG, "Error getting documents: ", task.getException());
                                             }
@@ -210,7 +213,7 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                         //do nothing
                     }
                 });
-                borrowedBooksAdapter.notifyDataSetChanged();
+                //borrowedBooksAdapter.notifyDataSetChanged();
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
