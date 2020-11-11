@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -69,15 +70,18 @@ public class RequestListActivity extends AppCompatActivity {
                 //get each element in requests field and add them to list
                 request_users = (ArrayList<String>) task.getResult().get("requests");
                 if(request_users!=null){
+                    requestList.clear();
                     for(int m=0; m<request_users.size(); m++) {
                         requestList.add(new Request(request_users.get(m), book_name));
                     }
                 }
+                //set adapter for the listview
+                requestAdapter = new RequestList(RequestListActivity.this, requestList);
+                request_list.setAdapter(requestAdapter);
+                requestAdapter.notifyDataSetChanged();
 
             }
         });
-        requestAdapter = new RequestList(this, requestList);
-        request_list.setAdapter(requestAdapter);
 
         //real-time change
         documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {

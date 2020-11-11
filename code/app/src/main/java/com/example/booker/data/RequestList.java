@@ -1,6 +1,7 @@
 package com.example.booker.data;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -179,44 +180,6 @@ public class RequestList extends ArrayAdapter<Request> {
                                 });
                     }
                 }
-/*                for(int i=0; i<requests.size(); i++){
-                    //when the user is not the accepted one
-                    if(i != position){
-                        final int where = i;
-                        db.collection("User").get()
-                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if(task.isSuccessful()){
-                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                //find a matched name, update the status of its borrowed book
-                                                if(document.getId().equals(requests.get(where).getUser_name())){
-                                                    //if decline a request, then for the user trying to borrow the book, it will disappear and send notification
-                                                    //delete the correspond book in borrower's borrowed list
-                                                    db.collection("User").document(document.getId()).collection("Borrowed")
-                                                            .document(request.getBook_name()).delete()
-                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                @Override
-                                                                public void onSuccess(Void aVoid) {
-
-                                                                    //notification code write here
-                                                                    Log.d(TAG, "Correspond user accept status successfully updated!");
-                                                                }
-                                                            })
-                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    Log.d(TAG, "Correspond user accept status failed to updated!");
-                                                                }
-                                                            });
-                                                }
-                                            }
-                                        }else{
-                                            Log.d(TAG, "Fail to find user col/doc!");
-                                        }
-                                    }
-                                });
-                    }*/
 
 
                 //delete all elements in Request array(update request list array) ???
@@ -230,7 +193,6 @@ public class RequestList extends ArrayAdapter<Request> {
                         }
                     }
                 });
-
 
             }
         });
