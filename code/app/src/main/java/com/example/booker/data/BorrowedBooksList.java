@@ -75,6 +75,9 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
             accept_book.setVisibility(View.VISIBLE);
             return_book.setVisibility(View.GONE);
             map_img.setVisibility(View.VISIBLE);
+
+
+            //for Map
             map_img.setOnClickListener(new View.OnClickListener() {
                 @Override
 
@@ -104,6 +107,12 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
 
                 }
             });
+
+
+            //end of map interaction
+
+
+
         }else{//requested, but not accept
             accept_book.setVisibility(View.GONE);
             return_book.setVisibility(View.GONE);
