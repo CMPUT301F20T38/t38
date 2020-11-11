@@ -1,6 +1,7 @@
 package com.example.booker.data;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.booker.R;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -22,9 +29,10 @@ import java.util.ArrayList;
  * is to customize the Borrowed Book list view and decide the buttons pattern
  * for each status
  */
-public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks> {
+public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
     private ArrayList<BorrowedBooks> borrowedBooks;
     private Context context;
+    private final String TAG="BorrowLookList";
 
     public BorrowedBooksList(Context context, ArrayList<BorrowedBooks> borrowedBooks) {
         super(context, 0, borrowedBooks);
@@ -67,6 +75,44 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks> {
             accept_book.setVisibility(View.VISIBLE);
             return_book.setVisibility(View.GONE);
             map_img.setVisibility(View.VISIBLE);
+
+
+            //for Map
+            map_img.setOnClickListener(new View.OnClickListener() {
+                @Override
+
+                public void onClick(View view) {
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("User")
+                            .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
+                            .document(borrowedBook.getTitle()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                            // Document found in the offline cache
+                            DocumentSnapshot document = task.getResult();
+                            Double lat= document.getDouble("latitude");
+                            Double lon= document.getDouble("longitude");
+                            Log.d(TAG, "Cached document data lat: " + lat);
+                            Log.d(TAG, "Cached document data lon : " + lon);
+
+
+
+                        } else {
+                            Log.d(TAG, "Cached get failed: ", task.getException());
+                        }
+                        }
+                    });
+
+                }
+            });
+
+
+            //end of map interaction
+
+
+
         }else{//requested, but not accept
             accept_book.setVisibility(View.GONE);
             return_book.setVisibility(View.GONE);

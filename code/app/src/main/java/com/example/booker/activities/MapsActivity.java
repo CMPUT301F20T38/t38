@@ -2,6 +2,7 @@ package com.example.booker.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -23,7 +24,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.booker.MainActivity;
 import com.example.booker.R;
+import com.example.booker.ui.lend.LendFragment;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -94,10 +97,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //widget
     private EditText mSearchText;
 
-    private LatLng pickedLocation;
+    private LatLng pickedLocation,finalLocation;
 
     private Button setLocation;
     private Place selectedPlace;
+
+    private String selectedBookname, selectedBorrower,selectedOwner;
+
 
 
 
@@ -138,8 +144,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         final FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
+        Intent receivedIntent = getIntent();
 
-        final CollectionReference collectionReference = db.collection("MapTest");
+
+
+        selectedBookname = receivedIntent.getExtras().getString("bookName");
+        selectedBorrower = receivedIntent.getExtras().getString("borrowerName");
+//        selectedOwner= receivedIntent.getExtras().getString("lenderName");
+
+        Log.d(TAG, "Data received  "+ selectedBookname+ "   borrower  "+ selectedBorrower);
+
+        final CollectionReference collectionReference = db.collection("User").document(selectedBorrower)
+                .collection("Borrowed");
 
         setLocation = (Button)findViewById(R.id.setLocationButton);
 
@@ -149,24 +165,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 if (pickedLocation != null){
+                    db.collection("User")
+                            .document(selectedBorrower)
+                            .collection("Borrowed").document(selectedBookname)
+                            .set(pickedLocation)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "Correspond user accept status successfully updated!");
 
-//                    collectionReference
-//                            .document("LatLng")
-//                            .set(pickedLocation)
-//                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                @Override
-//                                public void onSuccess(Void aVoid) {
-//                                    // These are a method which gets executed when the task is succeeded
-//                                    Log.d(TAG, "Data has been added successfully!");
-//                                }
-//                            })
-//                            .addOnFailureListener(new OnFailureListener() {
-//                                @Override
-//                                public void onFailure(@NonNull Exception e) {
-//                                    // These are a method which gets executed if there’s any problem
-//                                    Log.d(TAG, "Data could not be added!" + e.toString());
-//                                }
-//                            });
+                                    Intent goBackToLendFragment = new Intent(MapsActivity.this, MainActivity.class);
+                                    startActivity(goBackToLendFragment);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "Correspond user accept status failed to updated!");
+                                }
+                            });
+
+
                 }
 
 
@@ -212,6 +231,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
     // [END maps_current_place_on_create]
+
+    public LatLng getMapLocation(){
+        return finalLocation;
+    }
 
     /**
      * initial the search bar
