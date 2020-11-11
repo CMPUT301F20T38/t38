@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.booker.R;
+import com.example.booker.activities.MapsActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -193,6 +194,10 @@ public class RequestList extends ArrayAdapter<Request> {
                         }
                     }
                 });
+
+                Intent intent = new Intent(context, MapsActivity.class);
+                context.startActivity(intent);
+
 
             }
         });
