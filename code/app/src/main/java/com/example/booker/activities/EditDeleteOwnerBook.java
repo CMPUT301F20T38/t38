@@ -38,7 +38,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
-    private Button btnEdit, btnDelete, btnRequest;
+    private Button btnPhoto, btnEdit, btnDelete, btnRequest;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -67,6 +67,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         btnEdit = (Button) findViewById(R.id.owner_edit_btn);
         btnDelete = (Button) findViewById(R.id.owner_delete_btn);
         btnRequest = (Button) findViewById(R.id.owner_show_request);
+        btnPhoto = (Button) findViewById(R.id.owner_add_photo);
 
         editTitle.setText(title);
         editAuthor.setText(author);
@@ -78,6 +79,13 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
         final String userId = user.getUid();
         final CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
+
+        btnPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         // when the edit button is clicked, begin to submit book information to firestore
         btnEdit.setOnClickListener(new View.OnClickListener() {
