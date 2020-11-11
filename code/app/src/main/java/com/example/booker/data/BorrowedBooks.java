@@ -6,10 +6,12 @@ package com.example.booker.data;
  */
 public class BorrowedBooks extends Book{
     private String src;
+    private String borrower;
 
     public BorrowedBooks(String author, String title, String ISBN, String status, String owner, String borrower, String src) {
         super(author, title, ISBN, status, owner, borrower);
         this.src = src;
+        this.borrower=borrower;
     }
 
     public BorrowedBooks(){}
@@ -17,5 +19,7 @@ public class BorrowedBooks extends Book{
     public String getSrc() {
         return src;
     }
+
+
 
 }
