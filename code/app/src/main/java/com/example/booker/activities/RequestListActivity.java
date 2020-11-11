@@ -18,18 +18,13 @@ import com.example.booker.data.RequestList;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * RequestListActivity is the activity for the request in owner lend page
@@ -75,15 +70,18 @@ public class RequestListActivity extends AppCompatActivity {
                 //get each element in requests field and add them to list
                 request_users = (ArrayList<String>) task.getResult().get("requests");
                 if(request_users!=null){
+                    requestList.clear();
                     for(int m=0; m<request_users.size(); m++) {
                         requestList.add(new Request(request_users.get(m), book_name));
                     }
                 }
+                //set adapter for the listview
+                requestAdapter = new RequestList(RequestListActivity.this, requestList);
+                request_list.setAdapter(requestAdapter);
+                requestAdapter.notifyDataSetChanged();
 
             }
         });
-        requestAdapter = new RequestList(this, requestList);
-        request_list.setAdapter(requestAdapter);
 
         //real-time change
         documentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {

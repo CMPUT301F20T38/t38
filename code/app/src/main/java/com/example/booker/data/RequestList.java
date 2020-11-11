@@ -129,23 +129,20 @@ public class RequestList extends ArrayAdapter<Request> {
                             }
                         });
                 //update status for other users, loop all users
-                for(int i=0; i<requests.size(); i++){
-                    //when the user is not the accepted one
-
-                    if(i != position){
-                        final int where = i;
+                for(final Request user_request : requests){
+                    if(!user_request.getUser_name().equals(request.getUser_name())) {
                         db.collection("User").get()
                                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if(task.isSuccessful()){
+                                        if (task.isSuccessful()) {
                                             for (QueryDocumentSnapshot document : task.getResult()) {
                                                 //find a matched name, update the status of its borrowed book
-                                                if(document.getId().equals(requests.get(where).getUser_name())){
+                                                if (document.getId().equals(user_request.getUser_name())) {
                                                     //if decline a request, then for the user trying to borrow the book, it will disappear and send notification
                                                     //delete the correspond book in borrower's borrowed list
                                                     db.collection("User").document(document.getId()).collection("Borrowed")
-                                                            .document(request.getBook_name()).delete()
+                                                            .document(user_request.getBook_name()).delete()
                                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                 @Override
                                                                 public void onSuccess(Void aVoid) {
@@ -162,14 +159,28 @@ public class RequestList extends ArrayAdapter<Request> {
                                                             });
                                                 }
                                             }
-                                        }else{
+                                        } else {
                                             Log.d(TAG, "Fail to find user col/doc!");
                                         }
                                     }
                                 });
+                    }else{//change the borrower field in owner's book
+                        db.collection("User").document(mAuth.getCurrentUser().getUid()).collection("Lend")
+                                .document(request.getBook_name()).update("borrower",user_request.getUser_name())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "Correspond user accept status successfully updated!");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d(TAG, "Correspond user accept status failed to updated!");
+                                    }
+                                });
                     }
                 }
-
 
 
                 //delete all elements in Request array(update request list array) ???
@@ -187,6 +198,7 @@ public class RequestList extends ArrayAdapter<Request> {
                 Intent intent = new Intent(context, MapsActivity.class);
                 context.startActivity(intent);
 
+
             }
         });
         // decline correspond single user
@@ -195,7 +207,7 @@ public class RequestList extends ArrayAdapter<Request> {
             public void onClick(View view) {
                 mAuth = FirebaseAuth.getInstance();
                 db = FirebaseFirestore.getInstance();
-                //the document path for book will be change later
+                //the document path for owner's book
                 final DocumentReference documentRef = db.collection("User")
                         .document(mAuth.getCurrentUser().getUid()).collection("Lend")
                         .document(request.getBook_name());
@@ -207,7 +219,7 @@ public class RequestList extends ArrayAdapter<Request> {
                                 if(task.isSuccessful()){
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         //find a matched name, update the status of its borrowed book
-                                        if(document.getId().equals(requests.get(position).getUser_name())){
+                                        if(document.getId().equals(request.getUser_name())){
                                             //if decline a request, than for the user trying to borrow the book, it will disappear and send notification
                                             db.collection("User").document(document.getId()).collection("Borrowed")
                                                     .document(request.getBook_name()).delete()
@@ -231,7 +243,7 @@ public class RequestList extends ArrayAdapter<Request> {
                             }
                         });
                 //delete the correspond item in array
-                documentRef.update("request",FieldValue.arrayRemove(request.getUser_name())).addOnCompleteListener(new OnCompleteListener<Void>() {
+                documentRef.update("requests",FieldValue.arrayRemove(request.getUser_name())).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull  Task<Void> task) {
                         if(task.isSuccessful()){

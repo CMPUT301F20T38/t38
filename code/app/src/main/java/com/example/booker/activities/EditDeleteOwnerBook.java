@@ -9,12 +9,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.booker.R;
 import com.example.booker.data.Book;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
@@ -33,9 +38,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
-    private Button btnEdit, btnDelete, btnRequest;
+    private Button btnPhoto, btnEdit, btnDelete, btnRequest;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,7 +56,9 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         String title = book.getTitle();
         String ISBN = book.getISBN();
 
-
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
 
         editTitle = (EditText) findViewById(R.id.owner_ed_title);
         editAuthor = (EditText) findViewById(R.id.owner_ed_author);
@@ -59,6 +67,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         btnEdit = (Button) findViewById(R.id.owner_edit_btn);
         btnDelete = (Button) findViewById(R.id.owner_delete_btn);
         btnRequest = (Button) findViewById(R.id.owner_show_request);
+        btnPhoto = (Button) findViewById(R.id.owner_add_photo);
 
         editTitle.setText(title);
         editAuthor.setText(author);
@@ -68,17 +77,56 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         editAuthor.addTextChangedListener(textWatcher);
         editISBN.addTextChangedListener(textWatcher);
 
+        final String userId = user.getUid();
+        final CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
+
+        btnPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         // when the edit button is clicked, begin to submit book information to firestore
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final String prevTitle = book.getTitle();
                 book.setAuthor(editAuthor.getText().toString());
                 book.setTitle(editTitle.getText().toString());
                 book.setISBN(editISBN.getText().toString());
 
-                Log.d("Owner's edit book", "Is Click");
-                intent.putExtra("YeeSkywalker", book);
-                setResult(0, intent);
+                collectionReference
+                        .document(prevTitle)
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(prevTitle, "Edited");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(prevTitle, "Failed Edit");
+                            }
+                        });
+
+                collectionReference
+                        .document(book.getTitle())
+                        .set(book)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(book.getTitle(), "Updated");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(book.getTitle(), "Failed Updated");
+                            }
+                        });
                 finish();
             }
         });
@@ -88,8 +136,21 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d("Owner's delete book", "Is Clicked");
-                intent.putExtra("YeeSkywalker", book);
-                setResult(1, intent);
+                collectionReference
+                        .document(book.getTitle())
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(book.getTitle(), "Delete");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(book.getTitle(), "Delete Fail");
+                            }
+                        });
                 finish();
             }
         });

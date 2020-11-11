@@ -3,17 +3,16 @@ package com.example.booker.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -25,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.booker.R;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,6 +45,9 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -55,7 +58,7 @@ import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private static final String TAG = "map";
+    private static final String TAG = "Map Activity";
 
     private GoogleMap map;
 
@@ -94,6 +97,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng pickedLocation;
 
     private Button setLocation;
+    private Place selectedPlace;
 
 
 
@@ -115,6 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
+
         setContentView(R.layout.activity_maps);
 
 
@@ -129,7 +134,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        mSearchText = (EditText) findViewById(R.id.input_search);
+//        mSearchText = (EditText) findViewById(R.id.input_search);
 
         final FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
@@ -144,26 +149,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 if (pickedLocation != null){
-                    collectionReference
-                            .document("LatLng")
-                            .set(pickedLocation)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    // These are a method which gets executed when the task is succeeded
-                                    Log.d(TAG, "Data has been added successfully!");
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    // These are a method which gets executed if there’s any problem
-                                    Log.d(TAG, "Data could not be added!" + e.toString());
-                                }
-                            });
+
+//                    collectionReference
+//                            .document("LatLng")
+//                            .set(pickedLocation)
+//                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                @Override
+//                                public void onSuccess(Void aVoid) {
+//                                    // These are a method which gets executed when the task is succeeded
+//                                    Log.d(TAG, "Data has been added successfully!");
+//                                }
+//                            })
+//                            .addOnFailureListener(new OnFailureListener() {
+//                                @Override
+//                                public void onFailure(@NonNull Exception e) {
+//                                    // These are a method which gets executed if there’s any problem
+//                                    Log.d(TAG, "Data could not be added!" + e.toString());
+//                                }
+//                            });
                 }
 
 
+            }
+        });
+
+
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.getView().setBackgroundColor(Color.WHITE);
+
+//        autocompleteFragment.setTypeFilter(TypeFilter.ADDRESS);
+//
+//        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
+//                new LatLng(-33.880490,151.184363),
+//                new LatLng(-33.858754,151.229596)));
+//        autocompleteFragment.setCountries("IN");
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NotNull Place place) {
+                // TODO: Get info about the selected place.
+                selectedPlace =place;
+
+                Log.i(TAG, "Place: " + selectedPlace.getName() + ", " + selectedPlace.getId()+", "+
+                        selectedPlace.getLatLng()+", "+selectedPlace.getAddressComponents());
+
+                geoLocate();
+            }
+
+
+            @Override
+            public void onError(@NotNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
             }
         });
     }
@@ -175,21 +219,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void init(){
         Log.d(TAG, "init: initializing");
 
-        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
-
-                    //execute our method for searching
-                    geoLocate();
-                }
-
-                return false;
-            }
-        });
+//        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+//                if(actionId == EditorInfo.IME_ACTION_SEARCH
+//                        || actionId == EditorInfo.IME_ACTION_DONE
+//                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+//                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
+//
+//                    //execute our method for searching
+//                    geoLocate();
+//                }
+//
+//                return false;
+//            }
+//        });
         hideSoftKeyboard();
     }
     /**
@@ -199,7 +243,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void geoLocate(){
         Log.d(TAG, "geoLocate: geolocating");
 
-        String searchString = mSearchText.getText().toString();
+        String searchString = selectedPlace.getName();
+        Log.d(TAG, "geoLocate: searchString is "+searchString);
 
         Geocoder geocoder = new Geocoder(com.example.booker.activities.MapsActivity.this);
         List<Address> list = new ArrayList<>();
@@ -219,7 +264,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             pickedLocation = new LatLng(address.getLatitude(), address.getLongitude());
             moveCamera(pickedLocation, DEFAULT_ZOOM, address.getAddressLine(0));
-            mSearchText.setText("");
+//            mSearchText.setText("");
+            setLocation.setBackgroundColor(Color.parseColor("#d9a851"));
 
 
 
