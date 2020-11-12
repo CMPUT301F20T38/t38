@@ -51,7 +51,6 @@ public class AddOwnerBook extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_add_book);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
