@@ -276,10 +276,6 @@ public class RequestList extends ArrayAdapter<Request> {
 
                 mapIntent.putExtra("borrowerName", request.getUser_name());
                 Log.d(TAG, "putExtra: Borrower:"+request.getUser_name());
-
-
-
-
                 context.startActivity(mapIntent);
 
 

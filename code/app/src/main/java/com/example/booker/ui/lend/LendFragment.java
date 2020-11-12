@@ -7,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -55,6 +57,7 @@ import java.util.Map;
 public class LendFragment extends Fragment {
 
     private Button btnAdd;
+    private Spinner filter;
     private ListView ownerList;
     private OwnerListViewAdapter ownerAdapter;
     private FirebaseFirestore db;
@@ -69,11 +72,71 @@ public class LendFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
         btnAdd = (Button) root.findViewById(R.id.owner_book_add);
+        filter = (Spinner) root.findViewById(R.id.owner_book_filter);
         ownerList = (ListView) root.findViewById(R.id.owner_book_list);
 
         bookList = new ArrayList<>();
         ownerAdapter = new OwnerListViewAdapter(getContext(), bookList);
         ownerList.setAdapter(ownerAdapter);
+
+        final String[] categories = {"all", "avaliable", "accepted", "requested", "borrowed"};
+        filter.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, categories));
+
+        filter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, final int i, long l) {
+                if (user != null){
+                    final String selectedStatus = filter.getItemAtPosition(i).toString();
+                    final String userId = user.getUid();
+                    CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
+                    if (!selectedStatus.equals("all")) {
+                        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()){
+                                    bookList.clear();
+                                    Log.d("Filter", "Begins to Select");
+                                    for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                                        if (documentSnapshot.get("status").toString().equals(selectedStatus)){
+                                            Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
+                                                    documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
+                                            bookList.add(book);
+                                            Log.d(documentSnapshot.get("title").toString(), "added");
+                                        }
+                                    }
+                                    ownerAdapter.notifyDataSetChanged();
+                                    Log.d("Filter", "Selection Finished");
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    bookList.clear();
+                                    Log.d("Filter", "Begin Fetching All");
+                                    for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                        Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
+                                                documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
+                                        bookList.add(book);
+                                        Log.d(documentSnapshot.get("title").toString(), "added");
+                                    }
+                                    ownerAdapter.notifyDataSetChanged();
+                                    Log.d("Filter", "Fetching Finishded");
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         // When the item in list view is trigger, navigate to the edit or delete book activity
         ownerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -120,6 +183,7 @@ public class LendFragment extends Fragment {
                             Log.d(documentSnapshot.get("title").toString(), "added");
                         }
                     }
+                    filter.setSelection(0);
                     ownerAdapter.notifyDataSetChanged();
                     Log.d("Owner Adapter", "Loaded");
                 }
