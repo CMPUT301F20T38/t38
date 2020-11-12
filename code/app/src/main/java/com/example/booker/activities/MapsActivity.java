@@ -168,6 +168,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     db.collection("User")
                             .document(selectedBorrower)
                             .collection("Borrowed").document(selectedBookname)
+                            .collection("location").document("latLon")
                             .set(pickedLocation)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
