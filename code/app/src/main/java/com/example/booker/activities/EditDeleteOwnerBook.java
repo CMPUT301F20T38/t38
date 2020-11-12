@@ -83,6 +83,14 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         btnPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent goToPhoto = new Intent (EditDeleteOwnerBook.this, Photograph.class);
+                goToPhoto.putExtra("ISBN",ISBN );
+//                goToPhoto.putExtra("BookName",title);
+                Log.d("photo: BOOK ISBN", ISBN );
+
+                startActivity(goToPhoto);
+
+
 
             }
         });
