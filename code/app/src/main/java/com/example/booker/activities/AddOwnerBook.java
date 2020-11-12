@@ -6,16 +6,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NavUtils;
 
 import com.example.booker.R;
 import com.example.booker.data.Book;
@@ -24,14 +21,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 
 /**
  * Yee's Part
@@ -80,7 +74,7 @@ public class AddOwnerBook extends AppCompatActivity {
         ISBN = (EditText) findViewById(R.id.owner_add_ISBN);
         btnComfirm = (Button) findViewById(R.id.owner_add_confirm);
         photo = findViewById(R.id.photoView);
-        btnGallary = findViewById(R.id.gallary);
+        btnGallary = findViewById(R.id.gallery);
 
 
         if (author.toString().isEmpty()){
