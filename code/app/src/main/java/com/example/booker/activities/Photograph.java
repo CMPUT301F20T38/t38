@@ -176,6 +176,7 @@ public class Photograph extends AppCompatActivity {
 
             // Get the Uri of data
             filePath = data.getData();
+
             try {
 
                 // Setting image on image view using Bitmap
@@ -186,6 +187,8 @@ public class Photograph extends AppCompatActivity {
                                 getContentResolver(),
                                 filePath);
                 imageView.setImageBitmap(bitmap);
+
+               /* // thought process here: print all the image from fireStorage */
             }
 
             catch (IOException e) {
