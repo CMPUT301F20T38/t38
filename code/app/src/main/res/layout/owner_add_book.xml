@@ -16,7 +16,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="96dp"
+        android:layout_marginTop="268dp"
         android:layout_marginEnd="24dp"
         android:hint="@string/book_author"
         android:selectAllOnFocus="true"
@@ -67,6 +67,28 @@
         app:layout_constraintTop_toBottomOf="@+id/owner_add_ISBN"
         app:layout_constraintVertical_bias="0.2" />
 
+    <ImageView
+        android:id="@+id/photoView"
+        android:layout_width="174dp"
+        android:layout_height="178dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:src="@drawable/ic_baseline_image_24"
+        app:layout_constraintBottom_toTopOf="@+id/owner_add_author"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.433" />
+
+    <Button
+        android:id="@+id/takePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:text="Take photo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.258"
+        app:layout_constraintStart_toEndOf="@+id/photoView"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
