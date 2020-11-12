@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.Camera.autofocus" />
 
     <application
         android:allowBackup="true"
@@ -13,20 +16,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activities.ScanCodeActivity"></activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/maps_api_key" />
 
-        <activity android:name=".activities.RequestListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
+        <activity
+            android:name=".activities.RequestListActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".activities.BorrowedBookListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
@@ -36,48 +37,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".activities.ChangeProfile">
-
-        </activity>
-
-        <activity
-            android:name=".activities.UserSignUp" >
-
-        </activity>
-
-
-        <activity
-            android:name=".activities.UserLogin">
-
-        </activity>
-
-        <activity
-            android:name=".activities.AddOwnerBook">
-
-
-
-        </activity>
-
+        <activity android:name=".activities.ChangeProfile"></activity>
+        <activity android:name=".activities.UserSignUp"></activity>
+        <activity android:name=".activities.UserLogin"></activity>
+        <activity android:name=".activities.AddOwnerBook"></activity>
         <activity
             android:name=".activities.MapsActivity"
-            android:label="Maps"></activity>
-
+            android:label="Maps" />
         <activity
             android:name=".activities.DisplayMapActivity"
-            android:label="Maps2"></activity>
-
+            android:label="Maps2" />
         <activity
             android:name=".activities.Photograph"
-            android:label="Maps2"></activity>
-
-
-        <activity
-            android:name=".activities.EditDeleteOwnerBook">
-
-        </activity>
-
+            android:label="Maps2" />
+        <activity android:name=".activities.EditDeleteOwnerBook"></activity>
     </application>
 
 </manifest>

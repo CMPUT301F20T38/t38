@@ -68,6 +68,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:15.0.0'
     implementation 'com.google.android.libraries.places:places:2.4.0'
 
+    //ISBN
+    implementation 'com.google.android.gms:play-services-auth:16.0.0'
+    implementation 'me.dm7.barcodescanner:zxing:1.9'
 
 
     //image
