@@ -19,6 +19,7 @@ import com.example.booker.MainActivity;
 import com.example.booker.R;
 import com.example.booker.activities.DisplayMapActivity;
 import com.example.booker.activities.MapsActivity;
+import com.example.booker.activities.ScanCodeActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -123,7 +124,20 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
 
 
             //end of map interaction
-
+            //for ISBN, scan to confirm borrow the book and set status to borrowed
+            accept_book.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    Intent intent = new Intent(context.getApplicationContext(), ScanCodeActivity.class);
+                    //set the path to the user's book
+                    intent.putExtra("event","accept_book");
+                    intent.putExtra("book",borrowedBook.getTitle());
+                    intent.putExtra("owner",borrowedBook.getOwner());
+                    intent.putExtra("borrower",mAuth.getCurrentUser().getUid());
+                    context.startActivity(intent);
+                }
+            });
 
 
         }else{//requested, but not accept
