@@ -33,7 +33,8 @@ import java.text.DecimalFormat;
  * EditText title: Enable user to input title name when attend to add a boook
  * EditText ISBN: Enable user to input ISBN when attend to add a boook
  * Button btnComfirm: sumbit the form
- *
+ * Action bar deketed
+ * 
  * FirebaseAuth mAuth: the token of firebasemAuth reference
  * FirebaseFirestore db: the token of firebasefirestore reference
  */
@@ -51,7 +52,6 @@ public class AddOwnerBook extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_add_book);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
