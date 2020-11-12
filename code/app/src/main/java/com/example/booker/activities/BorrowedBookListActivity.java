@@ -84,139 +84,141 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                                 borrowedBooksList.add(borrowedBooks);
 
                                 Log.d(TAG, document.getId() + " => " + document.getData());
+
+                                borrowedBooksAdapter = new BorrowedBooksList(BorrowedBookListActivity.this, borrowedBooksList);
+                                borrowed_list.setAdapter(borrowedBooksAdapter);
+
+                                //real-time change
+                                collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>(){
+                                    @Override
+                                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                                        borrowedBooksList.clear();
+
+                                        for(QueryDocumentSnapshot doc: queryDocumentSnapshots){
+                                            String src = (String)doc.getData().get("src");
+                                            String title = (String)doc.getData().get("title");
+                                            String author = (String)doc.getData().get("author");
+                                            String owner= (String)doc.getData().get("owner");
+                                            String status = (String)doc.getData().get("status");
+                                            String ISBN = (String)doc.getData().get("ISBN");
+                                            String borrower = (String)doc.getData().get("borrower");
+                                            borrowedBooksList.add(new BorrowedBooks(author, title, ISBN, status, owner, borrower, src));
+                                        }
+                                        borrowedBooksAdapter.notifyDataSetChanged();
+                                    }
+                                });
+
+                                return_button.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        finish();
+                                    }
+                                });
+
+                                borrowed_filter.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(BorrowedBookListActivity.this);
+                                        //string array for dialog choose items
+                                        String[] choiceArray = new String[]{"Requested", "Accepted", "All"};
+                                        //set the builder title
+                                        builder.setTitle("Book Filter");
+                                        builder.setSingleChoiceItems(choiceArray, position, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                position = i;
+                                                if(position==0){//show requested
+                                                    borrowedBooksList.clear();
+                                                    collectionReference
+                                                            .get()
+                                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                            //only show status==requested
+                                                                            String status = (String)document.getData().get("status");
+                                                                            if(status.equals("requested")){
+                                                                                BorrowedBooks borrowedBooks = document.toObject(BorrowedBooks.class);
+                                                                                borrowedBooksList.add(borrowedBooks);
+                                                                            }
+                                                                            Log.d(TAG, document.getId() + " => " + document.getData());
+                                                                        }
+                                                                        borrowedBooksAdapter.notifyDataSetChanged();
+                                                                    } else {
+                                                                        Log.d(TAG, "Error getting documents: ", task.getException());
+                                                                    }
+                                                                }
+                                                            });
+                                                }else if(position==1){//show accepted
+                                                    borrowedBooksList.clear();
+                                                    collectionReference
+                                                            .get()
+                                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                            //only show status==accepted
+                                                                            String status = (String)document.getData().get("status");
+                                                                            if(status.equals("accepted")){
+
+                                                                                //Log.e("=====================================","position:  "+status);
+                                                                                BorrowedBooks borrowedBooks = document.toObject(BorrowedBooks.class);
+                                                                                borrowedBooksList.add(borrowedBooks);
+                                                                            }
+                                                                            Log.d(TAG, document.getId() + " => " + document.getData());
+                                                                        }
+                                                                        borrowedBooksAdapter.notifyDataSetChanged();
+                                                                    } else {
+                                                                        Log.d(TAG, "Error getting documents: ", task.getException());
+                                                                    }
+                                                                }
+                                                            });
+                                                }else{//show all
+                                                    borrowedBooksList.clear();
+                                                    collectionReference
+                                                            .get()
+                                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                            //show all
+                                                                            BorrowedBooks borrowedBooks = document.toObject(BorrowedBooks.class);
+                                                                            borrowedBooksList.add(borrowedBooks);
+
+                                                                            Log.d(TAG, document.getId() + " => " + document.getData());
+                                                                        }
+                                                                        borrowedBooksAdapter.notifyDataSetChanged();
+                                                                    } else {
+                                                                        Log.d(TAG, "Error getting documents: ", task.getException());
+                                                                    }
+                                                                }
+                                                            });
+                                                }
+                                                dialogInterface.dismiss();//return from dialog
+
+                                            }
+                                        });
+                                        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                //do nothing
+                                            }
+                                        });
+                                        //borrowedBooksAdapter.notifyDataSetChanged();
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                    }
+                                });
                             }
+
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 });
 
-        borrowedBooksAdapter = new BorrowedBooksList(this, borrowedBooksList);
-        borrowed_list.setAdapter(borrowedBooksAdapter);
-
-        //real-time change
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>(){
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
-                borrowedBooksList.clear();
-
-                for(QueryDocumentSnapshot doc: queryDocumentSnapshots){
-                    String src = (String)doc.getData().get("src");
-                    String title = (String)doc.getData().get("title");
-                    String author = (String)doc.getData().get("author");
-                    String owner= (String)doc.getData().get("owner");
-                    String status = (String)doc.getData().get("status");
-                    String ISBN = (String)doc.getData().get("ISBN");
-                    String borrower = (String)doc.getData().get("borrower");
-                    borrowedBooksList.add(new BorrowedBooks(author, title, ISBN, status, owner, borrower, src));
-                }
-                borrowedBooksAdapter.notifyDataSetChanged();
-            }
-        });
-
-        return_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-
-        borrowed_filter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(BorrowedBookListActivity.this);
-                //string array for dialog choose items
-                String[] choiceArray = new String[]{"Requested", "Accepted", "All"};
-                //set the builder title
-                builder.setTitle("Book Filter");
-                builder.setSingleChoiceItems(choiceArray, position, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        position = i;
-                        if(position==0){//show requested
-                            borrowedBooksList.clear();
-                            collectionReference
-                                    .get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                    //only show status==requested
-                                                    String status = (String)document.getData().get("status");
-                                                    if(status.equals("requested")){
-                                                        BorrowedBooks borrowedBooks = document.toObject(BorrowedBooks.class);
-                                                        borrowedBooksList.add(borrowedBooks);
-                                                    }
-                                                    Log.d(TAG, document.getId() + " => " + document.getData());
-                                                }
-                                                borrowedBooksAdapter.notifyDataSetChanged();
-                                            } else {
-                                                Log.d(TAG, "Error getting documents: ", task.getException());
-                                            }
-                                        }
-                                    });
-                        }else if(position==1){//show accepted
-                            borrowedBooksList.clear();
-                            collectionReference
-                                    .get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                    //only show status==accepted
-                                                    String status = (String)document.getData().get("status");
-                                                    if(status.equals("accepted")){
-
-                                                        //Log.e("=====================================","position:  "+status);
-                                                        BorrowedBooks borrowedBooks = document.toObject(BorrowedBooks.class);
-                                                        borrowedBooksList.add(borrowedBooks);
-                                                    }
-                                                    Log.d(TAG, document.getId() + " => " + document.getData());
-                                                }
-                                                borrowedBooksAdapter.notifyDataSetChanged();
-                                            } else {
-                                                Log.d(TAG, "Error getting documents: ", task.getException());
-                                            }
-                                        }
-                                    });
-                        }else{//show all
-                            borrowedBooksList.clear();
-                            collectionReference
-                                    .get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                    //show all
-                                                        BorrowedBooks borrowedBooks = document.toObject(BorrowedBooks.class);
-                                                        borrowedBooksList.add(borrowedBooks);
-
-                                                    Log.d(TAG, document.getId() + " => " + document.getData());
-                                                }
-                                                borrowedBooksAdapter.notifyDataSetChanged();
-                                            } else {
-                                                Log.d(TAG, "Error getting documents: ", task.getException());
-                                            }
-                                        }
-                                    });
-                        }
-                       dialogInterface.dismiss();//return from dialog
-
-                    }
-                });
-                builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        //do nothing
-                    }
-                });
-                //borrowedBooksAdapter.notifyDataSetChanged();
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
     }
 }

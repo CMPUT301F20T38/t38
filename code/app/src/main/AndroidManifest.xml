@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -15,14 +16,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/maps_api_key" />
+
         <activity android:name=".activities.RequestListActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
         </activity>
+
         <activity
             android:name=".activities.BorrowedBookListActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -65,6 +63,10 @@
         <activity
             android:name=".activities.MapsActivity"
             android:label="Maps"></activity>
+
+        <activity
+            android:name=".activities.DisplayMapActivity"
+            android:label="Maps2"></activity>
 
 
         <activity
