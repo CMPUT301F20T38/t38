@@ -175,8 +175,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 public void onSuccess(Void aVoid) {
                                     Log.d(TAG, "Correspond user accept status successfully updated!");
 
-                                    Intent goBackToLendFragment = new Intent(MapsActivity.this, MainActivity.class);
-                                    startActivity(goBackToLendFragment);
+                                    Intent scan_intent = new Intent(getApplicationContext(), ScanCodeActivity.class);
+                                    scan_intent.putExtra("event","owner_scan");
+                                    startActivity(scan_intent);
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {

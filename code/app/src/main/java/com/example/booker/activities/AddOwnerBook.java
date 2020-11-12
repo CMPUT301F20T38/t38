@@ -1,17 +1,18 @@
 package com.example.booker.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NavUtils;
 
 import com.example.booker.R;
 import com.example.booker.data.Book;
@@ -20,11 +21,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
-import java.text.DecimalFormat;
+import java.io.IOException;
 
 /**
  * Yee's Part
@@ -34,7 +35,7 @@ import java.text.DecimalFormat;
  * EditText ISBN: Enable user to input ISBN when attend to add a boook
  * Button btnComfirm: sumbit the form
  * Action bar deketed
- * 
+ *
  * FirebaseAuth mAuth: the token of firebasemAuth reference
  * FirebaseFirestore db: the token of firebasefirestore reference
  */
@@ -44,9 +45,17 @@ public class AddOwnerBook extends AppCompatActivity {
     private EditText title;
     private EditText ISBN;
     private Button btnComfirm;
+    private Button btnGallary;
+    private ImageView photo;
+    private Uri filePath;
+
+    final static String TAG ="image";
+    private final int PICK_IMAGE_REQUEST = 22;
 
     FirebaseAuth mAuth;
     FirebaseFirestore db;
+    FirebaseStorage storage;
+    StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -64,6 +73,9 @@ public class AddOwnerBook extends AppCompatActivity {
         title = (EditText) findViewById(R.id.owner_add_title);
         ISBN = (EditText) findViewById(R.id.owner_add_ISBN);
         btnComfirm = (Button) findViewById(R.id.owner_add_confirm);
+        photo = findViewById(R.id.photoView);
+        btnGallary = findViewById(R.id.gallery);
+
 
         if (author.toString().isEmpty()){
             author.requestFocus();
@@ -89,6 +101,8 @@ public class AddOwnerBook extends AppCompatActivity {
                 Book book = new Book(addAuthor, addTitle, addISBN, "avaliable", userId, "");
 
 
+
+
                 collectionReference
                         .document(addTitle)
                         .set(book)
@@ -105,8 +119,71 @@ public class AddOwnerBook extends AppCompatActivity {
                             }
                         });
 
+
             }
         });
+
+        btnGallary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                Log.d(TAG,"  pick the pic");
+                SelectImage();
+                Log.d(TAG,"  finshed the picking");
+            }
+        });
+    }
+
+    private void SelectImage() {
+
+        // Defining Implicit Intent to mobile gallery
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(
+                Intent.createChooser(
+                        intent,
+                        "Select Image from here..."),
+                PICK_IMAGE_REQUEST);
+    }
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode,
+                                    Intent data)
+    {
+
+        super.onActivityResult(requestCode,
+                resultCode,
+                data);
+
+        // checking request code and result code
+        // if request code is PICK_IMAGE_REQUEST and
+        // resultCode is RESULT_OK
+        // then set image in the image view
+        if (requestCode == PICK_IMAGE_REQUEST
+                && resultCode == RESULT_OK
+                && data != null
+                && data.getData() != null) {
+
+            // Get the Uri of data
+            filePath = data.getData();
+            try {
+
+                // Setting image on image view using Bitmap
+                Bitmap bitmap = MediaStore
+                        .Images
+                        .Media
+                        .getBitmap(
+                                getContentResolver(),
+                                filePath);
+                photo.setImageBitmap(bitmap);
+            }
+
+            catch (IOException e) {
+                // Log the exception
+                e.printStackTrace();
+            }
+        }
     }
 
 }
