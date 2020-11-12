@@ -1,6 +1,7 @@
 package com.example.booker.data;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.example.booker.MainActivity;
 import com.example.booker.R;
+import com.example.booker.activities.DisplayMapActivity;
+import com.example.booker.activities.MapsActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -86,7 +90,7 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     db.collection("User")
                             .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
-                            .document(borrowedBook.getTitle()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            .document(borrowedBook.getTitle()).collection("location").document("latLon").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()) {
@@ -96,6 +100,15 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
                             Double lon= document.getDouble("longitude");
                             Log.d(TAG, "Cached document data lat: " + lat);
                             Log.d(TAG, "Cached document data lon : " + lon);
+
+                            Intent goToDisplayMap = new Intent(context, DisplayMapActivity.class);
+                                goToDisplayMap.putExtra("LAT", lat);
+                                Log.d(TAG, "putExtra: Lattt:  "+lat);
+
+                                goToDisplayMap.putExtra("LON", lon);
+                                Log.d(TAG, "putExtra: LONGG:"+lon);
+
+                            context.startActivity(goToDisplayMap);
 
 
 
