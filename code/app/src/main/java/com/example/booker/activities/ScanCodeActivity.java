@@ -8,7 +8,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.example.booker.MainActivity;
 import com.example.booker.R;
 import com.google.zxing.Result;
 
@@ -32,9 +34,15 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
         Intent prev_intent = getIntent();
         String event = prev_intent.getStringExtra("event");
         if(event.equals("owner_scan")){
-            Intent return_intent = new Intent(getApplicationContext(), BorrowedBookListActivity.class);
+            Intent return_intent = new Intent(getApplicationContext(), MainActivity.class);
             return_intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(return_intent);
+        }else if(event.equals("owner_add_isbn")){
+            //Log.e("========================",result.getText());
+            Intent return_intent = new Intent();
+            return_intent.putExtra("ISBN",result.getText());
+            setResult(33,return_intent);
+            finish();
         }
 
         //onBackPressed();

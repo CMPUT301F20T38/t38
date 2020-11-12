@@ -47,10 +47,12 @@ public class AddOwnerBook extends AppCompatActivity {
     private Button btnComfirm;
     private Button btnGallary;
     private ImageView photo;
+    private ImageView add_ISBN;
     private Uri filePath;
 
     final static String TAG ="image";
     private final int PICK_IMAGE_REQUEST = 22;
+    private final int GET_ISBN = 33;//request code for isbn
 
     FirebaseAuth mAuth;
     FirebaseFirestore db;
@@ -74,6 +76,7 @@ public class AddOwnerBook extends AppCompatActivity {
         ISBN = (EditText) findViewById(R.id.owner_add_ISBN);
         btnComfirm = (Button) findViewById(R.id.owner_add_confirm);
         photo = findViewById(R.id.photoView);
+        add_ISBN = findViewById(R.id.add_isbn_button);
         btnGallary = findViewById(R.id.gallery);
 
 
@@ -132,6 +135,18 @@ public class AddOwnerBook extends AppCompatActivity {
                 Log.d(TAG,"  finshed the picking");
             }
         });
+
+        add_ISBN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // go to scan isbn activity
+                Intent intent = new Intent(AddOwnerBook.this, ScanCodeActivity.class);
+                //notify the event is add isbn
+                intent.putExtra("event", "owner_add_isbn");
+                startActivityForResult(intent, GET_ISBN);//Activity is started with requestCode 33
+            }
+        });
+
     }
 
     private void SelectImage() {
@@ -183,6 +198,8 @@ public class AddOwnerBook extends AppCompatActivity {
                 // Log the exception
                 e.printStackTrace();
             }
+        }else if(requestCode == GET_ISBN  && data != null ){
+            ISBN.setText(data.getStringExtra("ISBN"));
         }
     }
 
