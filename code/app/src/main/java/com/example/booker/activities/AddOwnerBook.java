@@ -33,7 +33,8 @@ import java.text.DecimalFormat;
  * EditText title: Enable user to input title name when attend to add a boook
  * EditText ISBN: Enable user to input ISBN when attend to add a boook
  * Button btnComfirm: sumbit the form
- *
+ * Action bar deketed
+ * 
  * FirebaseAuth mAuth: the token of firebasemAuth reference
  * FirebaseFirestore db: the token of firebasefirestore reference
  */
