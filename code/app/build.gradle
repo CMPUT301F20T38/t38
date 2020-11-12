@@ -70,5 +70,6 @@ dependencies {
 
 
 
-
+    //image
+    implementation 'com.google.firebase:firebase-storage'
 }
