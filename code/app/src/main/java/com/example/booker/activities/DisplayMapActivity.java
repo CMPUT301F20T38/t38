@@ -52,8 +52,10 @@ public class DisplayMapActivity extends FragmentActivity implements OnMapReadyCa
             @Override
             public void onClick(View view) {
 
-                    Intent intent = new Intent(DisplayMapActivity.this, BorrowedBookListActivity.class);
-                    startActivity(intent);
+                finish();
+
+//                    Intent intent = new Intent(DisplayMapActivity.this, BorrowedBookListActivity.class);
+//                    startActivity(intent);
             }
 
         });
