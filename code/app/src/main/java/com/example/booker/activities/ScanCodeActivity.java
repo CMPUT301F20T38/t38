@@ -20,6 +20,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+//copy
+
 
 public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler{
     int MY_PERMISSIONS_REQUEST_CAMERA=0;

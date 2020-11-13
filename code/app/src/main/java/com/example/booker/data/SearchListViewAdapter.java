@@ -100,7 +100,7 @@ public class SearchListViewAdapter extends BaseAdapter {
         component.author.setText("Author: "+(String)bookList.get(i).get("author"));
         component.title.setText("Title: "+(String)bookList.get(i).get("title"));
         component.ISBN.setText("ISBN: "+(String)bookList.get(i).get("ISBN"));
-        component.ownerName.setText("owner:"+(String)bookList.get(i).get("owner"));
+        component.ownerName.setText("owner:"+(String)bookList.get(i).get("owner_name"));
         component.status.setText("status:"+(String)bookList.get(i).get("status"));
 
 
@@ -150,10 +150,10 @@ public class SearchListViewAdapter extends BaseAdapter {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             final String borrower_name = documentSnapshot.getString("Name");
-                            Log.e("================================",bookList.get(where).get("owner_uid").toString()+bookList.get(where).get("title").toString());
+                            //Log.e("================================",bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
                             //add to owner request list
                             db.collection("User")
-                                    .document(bookList.get(where).get("owner_uid").toString()).collection("Lend")
+                                    .document(bookList.get(where).get("owner").toString()).collection("Lend")
                                     .document(bookList.get(where).get("title").toString()).update("requests", FieldValue.arrayUnion(mAuth.getCurrentUser().getUid()))
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
