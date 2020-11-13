@@ -54,6 +54,7 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
             String owner  = prev_intent.getStringExtra("owner");
             String borrower  = prev_intent.getStringExtra("borrower");
             String book  = prev_intent.getStringExtra("book");
+            Log.e("================================================",owner+borrower+book);
             //firebase path
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             //path to the ISBN of owner
@@ -66,6 +67,7 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                                 String ISBN = task.getResult().get("isbn").toString();
                                 //decide if the ISBN code is the same as the owner's isbn
                                 if(result.getText().equals(ISBN)){
+                                    Log.e("======================================================",result.getText()+"   "+ISBN);
                                     //change owner book status
                                     db.collection("User").document(owner)
                                             .collection("Lend").document(book).update("status","borrowed")
@@ -87,9 +89,10 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                                                     else{Log.d(TAG, "Change borrower status failed: ", task.getException());}
                                                 }
                                             });
-                                }
+                                }else{Log.e("======================================================",result.getText()+"   "+ISBN);}
                             }else{
-                                Log.d(TAG, "Cached get failed: ", task.getException());
+
+                                Log.d(TAG, "The accepted book didn't match: ", task.getException());
                             }
                             finish();//end activity
                         }

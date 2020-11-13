@@ -38,6 +38,7 @@ public class SearchListViewAdapter extends BaseAdapter {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private Map<String, Object> null_field;//in order to create a document with null field
+    private String owner;
 
     public SearchListViewAdapter(Context context, List<Map<String, Object>> bookList) {
         this.bookList = bookList;
@@ -73,7 +74,10 @@ public class SearchListViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        Log.d("cs", "go");
+
+        //set the request button reaction
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         Component component = null;
         if (view == null){
 
@@ -99,13 +103,9 @@ public class SearchListViewAdapter extends BaseAdapter {
         component.ownerName.setText("owner:"+(String)bookList.get(i).get("owner"));
         component.status.setText("status:"+(String)bookList.get(i).get("status"));
 
-        //set the request button reaction
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+
         request_button = view.findViewById(R.id.request_button);
         final int where = i;
-        null_field = new HashMap<>();
-        null_field.put("nothing","");
         request_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -150,10 +150,10 @@ public class SearchListViewAdapter extends BaseAdapter {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             final String borrower_name = documentSnapshot.getString("Name");
-                            //Log.e("================================",documentSnapshot.getId()+bookList.get(where).get("owner").toString()+bookList.get(where).get("title").toString());
+                            Log.e("================================",bookList.get(where).get("owner_uid").toString()+bookList.get(where).get("title").toString());
                             //add to owner request list
                             db.collection("User")
-                                    .document(bookList.get(where).get("owner").toString()).collection("Lend")
+                                    .document(bookList.get(where).get("owner_uid").toString()).collection("Lend")
                                     .document(bookList.get(where).get("title").toString()).update("requests", FieldValue.arrayUnion(mAuth.getCurrentUser().getUid()))
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override

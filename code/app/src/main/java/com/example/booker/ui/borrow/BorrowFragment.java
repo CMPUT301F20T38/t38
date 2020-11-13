@@ -200,7 +200,7 @@ public class BorrowFragment extends Fragment {
                                         map.put("title", document.getString("title"));
                                         map.put("ISBN", document.getString("isbn"));
 
-                                        //map.put("owner",document.getString("owner"));
+                                        map.put("owner_uid",document.getString("owner"));
                                         map.put("owner", finalUsermap1.get(uid).toString());
                                         map.put("status",document.getString("status"));
 
@@ -271,7 +271,7 @@ public class BorrowFragment extends Fragment {
                                     map.put("title", document.getString("title"));
                                     map.put("ISBN", document.getString("isbn"));
 
-                                    //map.put("owner",document.getString("owner"));
+                                    map.put("owner_uid",document.getString("owner"));
                                     map.put("owner", userMAP.get(uid).toString());
                                     map.put("status", document.getString("status"));
 
