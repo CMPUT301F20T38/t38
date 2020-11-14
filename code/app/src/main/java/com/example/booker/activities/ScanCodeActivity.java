@@ -1,25 +1,34 @@
 package com.example.booker.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.booker.MainActivity;
-import com.example.booker.R;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.example.booker.data.Request;
+import com.example.booker.data.RequestList;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import com.example.booker.data.RequestList;
 //copy
 
 
@@ -27,6 +36,12 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
     int MY_PERMISSIONS_REQUEST_CAMERA=0;
     ZXingScannerView scannerView;
     private final String TAG="Scanner";
+
+    private String selectedBookname, selectedBorrower,selectedOwner;
+
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private LatLng pickedLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +56,159 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
         //first check which event it is
         Intent prev_intent = getIntent();
         String event = prev_intent.getStringExtra("event");
+        Double lat = prev_intent.getExtras().getDouble("LAT1");
+        Double lon = prev_intent.getExtras().getDouble("LON1");
+        selectedBookname = prev_intent.getExtras().getString("bookName");
+        selectedBorrower = prev_intent.getExtras().getString("borrowerName");
+        pickedLocation = new LatLng(lat,lon);
+
+        Log.d(TAG, "Data received  "+ selectedBookname+ "   borrower  "+ selectedBorrower);
+
+
+
         if(event.equals("owner_scan")){
-            Intent return_intent = new Intent(getApplicationContext(), MainActivity.class);
+
+                            //find the path to the correspond Request
+                final DocumentReference documentRef = db.collection("User")
+                        .document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend")
+                        .document(selectedBookname);
+                DocumentReference owner_path = db.collection("User")
+                        .document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend")
+                        .document(selectedBookname);
+                //change book status for owner
+                owner_path.update("status","accepted");
+                owner_path.update("requests", FieldValue.arrayRemove());
+
+                //change borrow status for accepted user
+                db.collection("User").get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if(task.isSuccessful()){
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        //find a matched name, update the status of its borrowed book
+                                        if(document.getId().equals(selectedBorrower)){
+                                            //change status to accepted
+                                            db.collection("User").document(document.getId()).collection("Borrowed")
+                                                    .document(selectedBookname).update("status","accepted")
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "Correspond user accept status successfully updated!");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.d(TAG, "Correspond user accept status failed to updated!");
+                                                        }
+                                                    });
+
+
+
+                                        }
+                                    }
+                                }else{
+                                    Log.d(TAG, "Fail to find user col/doc!");
+                                }
+                            }
+                        });
+                //update status for other users, loop all users
+                for(final Request user_request : requests){
+                    if(!user_request.getUser_name().equals(selectedBorrower)) {
+                        db.collection("User").get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                //find a matched name, update the status of its borrowed book
+                                                if (document.getId().equals(user_request.getUser_name())) {
+                                                    //if decline a request, then for the user trying to borrow the book, it will disappear and send notification
+                                                    //delete the correspond book in borrower's borrowed list
+                                                    db.collection("User").document(document.getId()).collection("Borrowed")
+                                                            .document(user_request.getBook_name()).delete()
+                                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+
+                                                                    //notification code write here
+                                                                    Log.d(TAG, "Correspond user accept status successfully updated!");
+                                                                }
+                                                            })
+                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    Log.d(TAG, "Correspond user accept status failed to updated!");
+                                                                }
+                                                            });
+                                                }
+                                            }
+                                        } else {
+                                            Log.d(TAG, "Fail to find user col/doc!");
+                                        }
+                                    }
+                                });
+                    }else{//change the borrower field in owner's book
+                        db.collection("User").document(mAuth.getCurrentUser().getUid()).collection("Lend")
+                                .document(selectedBookname).update("borrower",user_request.getUser_name())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "Correspond user accept status successfully updated!");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d(TAG, "Correspond user accept status failed to updated!");
+                                    }
+                                });
+                    }
+                }
+
+
+                //delete all elements in Request array(update request list array) ???
+                documentRef.update("requests",null).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Log.d(TAG, "Remove all users successfully! ");
+                        }else{
+                            Log.d(TAG, "Fail to remove all users!");
+                        }
+                    }
+                });
+
+
+            db.collection("User")
+                            .document(selectedBorrower)
+                            .collection("Borrowed").document(selectedBookname)
+                            .collection("location").document("latLon")
+                            .set(pickedLocation)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "Correspond user accept status successfully updated!");
+
+                                    Intent scan_intent = new Intent(getApplicationContext(), ScanCodeActivity.class);
+                                    scan_intent.putExtra("event","owner_scan");
+                                    startActivity(scan_intent);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d(TAG, "Correspond user accept status failed to updated!");
+                                }
+                            });
+
+
+
+
+            Intent return_intent = new Intent(getApplicationContext(), RequestList.class);
             return_intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(return_intent);
         }else if(event.equals("owner_add_isbn")){

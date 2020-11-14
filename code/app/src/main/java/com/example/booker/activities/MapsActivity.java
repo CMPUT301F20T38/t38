@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,9 +25,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.booker.MainActivity;
 import com.example.booker.R;
-import com.example.booker.ui.lend.LendFragment;
+import com.example.booker.data.Request;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -39,8 +39,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -103,6 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Place selectedPlace;
 
     private String selectedBookname, selectedBorrower,selectedOwner;
+    private Request myrequest;
 
 
 
@@ -147,12 +146,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Intent receivedIntent = getIntent();
 
 
-
+//
         selectedBookname = receivedIntent.getExtras().getString("bookName");
         selectedBorrower = receivedIntent.getExtras().getString("borrowerName");
-//        selectedOwner= receivedIntent.getExtras().getString("lenderName");
 
+//        selectedOwner= receivedIntent.getExtras().getString("lenderName");
+//
         Log.d(TAG, "Data received  "+ selectedBookname+ "   borrower  "+ selectedBorrower);
+
 
         final CollectionReference collectionReference = db.collection("User").document(selectedBorrower)
                 .collection("Borrowed");
@@ -165,27 +166,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 if (pickedLocation != null){
-                    db.collection("User")
-                            .document(selectedBorrower)
-                            .collection("Borrowed").document(selectedBookname)
-                            .collection("location").document("latLon")
-                            .set(pickedLocation)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "Correspond user accept status successfully updated!");
 
-                                    Intent scan_intent = new Intent(getApplicationContext(), ScanCodeActivity.class);
-                                    scan_intent.putExtra("event","owner_scan");
-                                    startActivity(scan_intent);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "Correspond user accept status failed to updated!");
-                                }
-                            });
+
+
+
+                    Intent scan_intent = new Intent(getApplicationContext(), ScanCodeActivity.class);
+                    scan_intent.putExtra("LAT1", pickedLocation.latitude);
+                    scan_intent.putExtra("LON1", pickedLocation.longitude);
+                    scan_intent.putExtra("bookName", selectedBookname);
+                    scan_intent.putExtra("borrowerName", selectedBorrower);
+
+
+                    Log.d(TAG, "Data received  "+ selectedBookname+ "   borrower  "+ selectedBorrower);
+
+
+
+                    scan_intent.putExtra("event","owner_scan");
+                    startActivity(scan_intent);
+
+
+
+
+
+//                    db.collection("User")
+//                            .document(selectedBorrower)
+//                            .collection("Borrowed").document(selectedBookname)
+//                            .collection("location").document("latLon")
+//                            .set(pickedLocation)
+//                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                @Override
+//                                public void onSuccess(Void aVoid) {
+//                                    Log.d(TAG, "Correspond user accept status successfully updated!");
+//
+//                                    Intent scan_intent = new Intent(getApplicationContext(), ScanCodeActivity.class);
+//                                    scan_intent.putExtra("event","owner_scan");
+//                                    startActivity(scan_intent);
+//                                }
+//                            })
+//                            .addOnFailureListener(new OnFailureListener() {
+//                                @Override
+//                                public void onFailure(@NonNull Exception e) {
+//                                    Log.d(TAG, "Correspond user accept status failed to updated!");
+//                                }
+//                            });
 
 
                 }
@@ -271,7 +294,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String searchString = selectedPlace.getName();
         Log.d(TAG, "geoLocate: searchString is "+searchString);
 
-        Geocoder geocoder = new Geocoder(com.example.booker.activities.MapsActivity.this);
+        Geocoder geocoder = new Geocoder(MapsActivity.this);
         List<Address> list = new ArrayList<>();
         try{
             list = geocoder.getFromLocationName(searchString, 1);
@@ -558,7 +581,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         // Show a dialog offering the user the list of likely places, and add a
                         // marker at the selected place.
-                        com.example.booker.activities.MapsActivity.this.openPlacesDialog();
+                        MapsActivity.this.openPlacesDialog();
                     }
                     else {
                         Log.e(TAG, "Exception: %s", task.getException());
