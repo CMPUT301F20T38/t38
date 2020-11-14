@@ -1,9 +1,12 @@
 package com.example.booker.activities;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 
 
@@ -12,30 +15,48 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.booker.R;
+import com.example.booker.data.UploadImage;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.UUID;
+
+import static com.google.common.io.Files.getFileExtension;
 
 public class Photograph extends AppCompatActivity {
 
     // views for button
     private Button btnSelect, btnUpload;
+    private TextView mTextViewShowUploads;
+    private EditText mEditTextFileName;
+
 
     // view for image view
     private ImageView imageView;
+
+    private ProgressBar mProgressBar;
 
     // Uri indicates, where the image will be picked from
     private Uri filePath;
@@ -44,9 +65,11 @@ public class Photograph extends AppCompatActivity {
     private final int PICK_IMAGE_REQUEST = 22;
 
     // instance for firebase storage and StorageReference
-    FirebaseStorage storage;
-    StorageReference storageReference;
+    private StorageReference storageReference;
+    private DatabaseReference mDatabaseRef;
     private FirebaseAuth mAuth;
+    private StorageTask mUploadTask;
+    private String downloadUrl;
 
     final static String TAG ="image";
     private String bookISBN;
@@ -60,9 +83,14 @@ public class Photograph extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // initialise views
-        btnSelect = findViewById(R.id.btnChoose);
-        btnUpload = findViewById(R.id.btnUpload);
-        imageView = findViewById(R.id.imgView);
+        btnSelect = findViewById(R.id.button_choose_image);
+        btnUpload = findViewById(R.id.button_upload);
+        imageView = findViewById(R.id.image_view);
+        mProgressBar = findViewById(R.id.progress_bar);
+        mEditTextFileName = findViewById(R.id.edit_text_file_name);
+        mTextViewShowUploads = findViewById(R.id.text_view_show_uploads);
+
+
 
         Intent receiveISBN = getIntent();
         bookISBN = receiveISBN.getExtras().getString("ISBN");
@@ -70,8 +98,8 @@ public class Photograph extends AppCompatActivity {
 
 
         // get the Firebase  storage reference
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
+        storageReference = FirebaseStorage.getInstance().getReference("uploadImage");
+        mDatabaseRef= FirebaseDatabase.getInstance().getReference("uploadImage");
 
         // on pressing btnSelect SelectImage() is called
         btnSelect.setOnClickListener(new View.OnClickListener() {
@@ -87,12 +115,37 @@ public class Photograph extends AppCompatActivity {
         // on pressing btnUpload uploadImage() is called
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                uploadImage();
+            public void onClick(View v) {
+                if (mUploadTask != null && mUploadTask.isInProgress()) {
+                    Toast.makeText(Photograph.this, "Upload in progress", Toast.LENGTH_SHORT).show();
+                } else {
+                    uploadImage();
+                }
             }
         });
+
+
+        mTextViewShowUploads.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openImagesActivity();
+
+            }
+        });
+
+
+
+
+
     }
+
+    private void openImagesActivity() {
+
+        Intent intent =new Intent(this, ImagesActivity.class);
+        intent.putExtra("ISBN",bookISBN);
+        startActivity(intent);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -109,35 +162,8 @@ public class Photograph extends AppCompatActivity {
 
     }
 
-//    private void signInAnonymously() {
-//
-//        // [START signin_anonymously]
-//        mAuth.signInAnonymously()
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()) {
-//                            // Sign in success, update UI with the signed-in user's information
-//                            Log.d(TAG, "signInAnonymously:success");
-//                            FirebaseUser user = mAuth.getCurrentUser();
-//
-//
-//
-//                        } else {
-//                            // If sign in fails, display a message to the user.
-//                            Log.w(TAG, "signInAnonymously:failure", task.getException());
-//                            Toast.makeText(AddBookPhoto.this, "Authentication failed.",
-//                                    Toast.LENGTH_SHORT).show();
-//
-//                        }
-//
-//                        // [START_EXCLUDE]
-//
-//                        // [END_EXCLUDE]
-//                    }
-//                });
-//        // [END signin_anonymously]
-//    }
+
+
 
     // Select Image method
     private void SelectImage()
@@ -176,23 +202,20 @@ public class Photograph extends AppCompatActivity {
 
             // Get the Uri of data
             filePath = data.getData();
-            try {
 
-                // Setting image on image view using Bitmap
-                Bitmap bitmap = MediaStore
-                        .Images
-                        .Media
-                        .getBitmap(
-                                getContentResolver(),
-                                filePath);
-                imageView.setImageBitmap(bitmap);
-            }
 
-            catch (IOException e) {
-                // Log the exception
-                e.printStackTrace();
-            }
+                Picasso.get().load(filePath).into(imageView);
+
+
+
         }
+    }
+
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
     }
 
     // UploadImage method
@@ -201,47 +224,67 @@ public class Photograph extends AppCompatActivity {
         if (filePath != null) {
 
             // Code for showing progressDialog while uploading
-            final ProgressDialog progressDialog
-                    = new ProgressDialog(this);
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+//            final ProgressDialog progressDialog
+//                    = new ProgressDialog(this);
+//            progressDialog.setTitle("Uploading...");
+//            progressDialog.show();
 
             // Defining the child of storageReference
-            StorageReference ref
+            StorageReference imageRef
                     = storageReference
                     .child(
                             bookISBN+"/"
-                                    + UUID.randomUUID().toString());
+                                    + System.currentTimeMillis()
+                                    + "." + getFileExtension(filePath));
 
             // adding listeners on upload
             // or failure of image
-            ref.putFile(filePath)
+            mUploadTask=imageRef.putFile(filePath)
                     .addOnSuccessListener(
                             new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
                                 @Override
-                                public void onSuccess(
-                                        UploadTask.TaskSnapshot taskSnapshot)
-                                {
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot){
 
                                     // Image uploaded successfully
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mProgressBar.setProgress(0);
+                                        }
+                                    }, 500);
                                     // Dismiss dialog
-                                    progressDialog.dismiss();
-                                    Toast
-                                            .makeText(Photograph.this,
-                                                    "Image Uploaded!!",
-                                                    Toast.LENGTH_SHORT)
-                                            .show();
+//                                    progressDialog.dismiss();
+
+                                    Toast.makeText(Photograph.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
+                                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            downloadUrl = uri.toString();
+                                            //push to database
+                                            UploadImage upload = new UploadImage( mEditTextFileName.getText().toString().trim(),
+                                                    downloadUrl);
+
+                                            Log.d(TAG, "name   "+mEditTextFileName.getText().toString().trim());
+                                            Log.d(TAG, "URL   "+taskSnapshot.getUploadSessionUri().toString());
+                                            String uploadId = mDatabaseRef.push().getKey();
+                                            Log.d(TAG, "uploadId   "+uploadId);
+
+                                            mDatabaseRef.child(bookISBN).child(uploadId).setValue(upload);
+
+                                        }
+                                    });
+
                                 }
                             })
 
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onFailure(@NonNull Exception e)
-                        {
+                        public void onFailure(@NonNull Exception e) {
 
                             // Error, Image not uploaded
-                            progressDialog.dismiss();
+//                            progressDialog.dismiss();
                             Toast
                                     .makeText(Photograph.this,
                                             "Failed " + e.getMessage(),
@@ -255,19 +298,20 @@ public class Photograph extends AppCompatActivity {
                                 // Progress Listener for loading
                                 // percentage on the dialog box
                                 @Override
-                                public void onProgress(
-                                        UploadTask.TaskSnapshot taskSnapshot)
-                                {
-                                    double progress
-                                            = (100.0
-                                            * taskSnapshot.getBytesTransferred()
-                                            / taskSnapshot.getTotalByteCount());
-                                    progressDialog.setMessage(
-                                            "Uploaded "
-                                                    + (int)progress + "%");
+                                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                                    mProgressBar.setProgress((int) progress);
+//                                    progressDialog.setMessage(
+//                                            "Uploaded "
+//                                                    + (int)progress + "%");
                                 }
                             });
+
         }
+        else{
+            Toast.makeText(this,"No file selected", Toast.LENGTH_LONG).show();
+        }
+
     }
 
 

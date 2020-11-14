@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ScanCodeActivity"></activity>
+        <activity android:name=".activities.ImagesActivity"></activity>
+        <activity android:name=".activities.ScanCodeActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -24,10 +25,10 @@
 
         <activity
             android:name=".activities.RequestListActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.BorrowedBookListActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
@@ -37,20 +38,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ChangeProfile"></activity>
-        <activity android:name=".activities.UserSignUp"></activity>
-        <activity android:name=".activities.UserLogin"></activity>
-        <activity android:name=".activities.AddOwnerBook"></activity>
-        <activity
-            android:name=".activities.MapsActivity"
-            android:label="Maps" />
+        <activity android:name=".activities.ChangeProfile" />
+        <activity android:name=".activities.UserSignUp" />
+        <activity android:name=".activities.UserLogin" />
+        <activity android:name=".activities.AddOwnerBook" />
+        <activity android:name=".activities.MapsActivity" />
+
+        <activity android:name=".activities.ImagesActivity" />
+
         <activity
             android:name=".activities.DisplayMapActivity"
             android:label="Maps2" />
         <activity
             android:name=".activities.Photograph"
             android:label="Maps2" />
-        <activity android:name=".activities.EditDeleteOwnerBook"></activity>
+        <activity android:name=".activities.EditDeleteOwnerBook" />
     </application>
 
 </manifest>
