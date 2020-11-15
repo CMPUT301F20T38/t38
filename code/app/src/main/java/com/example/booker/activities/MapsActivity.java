@@ -180,7 +180,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "Correspond user accept status successfully updated!");
+                                    Log.d(TAG, "Correspond user accept status successfully updated!"+selectedOwner);
                                     DocumentReference owner_path = db.collection("User")
                                             .document(selectedOwner)
                                             .collection("Lend")
