@@ -1,5 +1,6 @@
 package com.example.booker.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -8,7 +9,7 @@ import java.util.ArrayList;
  * username is not real username, instead it's a hash value
  * book_name is used for finding path for correspond book
  */
-public class Request {
+public class Request implements Serializable {
     private String user_name;
     private String book_name;
 

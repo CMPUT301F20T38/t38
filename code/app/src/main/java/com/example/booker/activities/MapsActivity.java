@@ -26,6 +26,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.example.booker.MainActivity;
 import com.example.booker.R;
+import com.example.booker.data.Request;
 import com.example.booker.ui.lend.LendFragment;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -52,7 +53,11 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -103,6 +108,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Place selectedPlace;
 
     private String selectedBookname, selectedBorrower,selectedOwner;
+    private ArrayList<Request> requests;
 
 
 
@@ -150,9 +156,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         selectedBookname = receivedIntent.getExtras().getString("bookName");
         selectedBorrower = receivedIntent.getExtras().getString("borrowerName");
-//        selectedOwner= receivedIntent.getExtras().getString("lenderName");
+        selectedOwner = receivedIntent.getExtras().getString("ownerName");
+        requests = (ArrayList<Request>) receivedIntent.getSerializableExtra("requests");
 
-        Log.d(TAG, "Data received  "+ selectedBookname+ "   borrower  "+ selectedBorrower);
+        //Log.d(TAG, "Data received  "+ selectedBookname+ "   borrower  "+ selectedBorrower);
 
         final CollectionReference collectionReference = db.collection("User").document(selectedBorrower)
                 .collection("Borrowed");
@@ -173,11 +180,119 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "Correspond user accept status successfully updated!");
+                                    Log.d(TAG, "Correspond user accept status successfully updated!"+selectedOwner);
+                                    DocumentReference owner_path = db.collection("User")
+                                            .document(selectedOwner)
+                                            .collection("Lend")
+                                            .document(selectedBookname);
+                                    //change book status for owner if the return result is valid
+                                    owner_path.update("status","accepted");
+                                    owner_path.update("requests", FieldValue.arrayRemove());
 
-                                    Intent scan_intent = new Intent(getApplicationContext(), ScanCodeActivity.class);
-                                    scan_intent.putExtra("event","owner_scan");
-                                    startActivity(scan_intent);
+                                    //change borrow status for accepted user
+                                    db.collection("User").get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if(task.isSuccessful()){
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                            //find a matched name, update the status of its borrowed book
+                                                            if(document.getId().equals(selectedBorrower)){
+                                                                //change status to accepted
+                                                                db.collection("User").document(document.getId()).collection("Borrowed")
+                                                                        .document(selectedBookname).update("status","accepted")
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                Log.d(TAG, "Correspond user accept status successfully updated!");
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                                Log.d(TAG, "Correspond user accept status failed to updated!");
+                                                                            }
+                                                                        });
+
+
+
+
+                                                            }
+                                                        }
+                                                    }else{
+                                                        Log.d(TAG, "Fail to find user col/doc!");
+                                                    }
+                                                }
+                                            });
+                                    //update status for other users, loop all users
+                                    for(final Request user_request : requests){
+                                        if(!user_request.getUser_name().equals(selectedBorrower)) {
+                                            db.collection("User").get()
+                                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                            if (task.isSuccessful()) {
+                                                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                    //find a matched name, update the status of its borrowed book
+                                                                    if (document.getId().equals(user_request.getUser_name())) {
+                                                                        //if decline a request, then for the user trying to borrow the book, it will disappear and send notification
+                                                                        //delete the correspond book in borrower's borrowed list
+                                                                        db.collection("User").document(document.getId()).collection("Borrowed")
+                                                                                .document(user_request.getBook_name()).delete()
+                                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onSuccess(Void aVoid) {
+
+                                                                                        //notification code write here
+                                                                                        Log.d(TAG, "Correspond user accept status successfully updated!");
+                                                                                    }
+                                                                                })
+                                                                                .addOnFailureListener(new OnFailureListener() {
+                                                                                    @Override
+                                                                                    public void onFailure(@NonNull Exception e) {
+                                                                                        Log.d(TAG, "Correspond user accept status failed to updated!");
+                                                                                    }
+                                                                                });
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                Log.d(TAG, "Fail to find user col/doc!");
+                                                            }
+                                                        }
+                                                    });
+                                        }else{//change the borrower field in owner's book
+                                            db.collection("User").document(selectedOwner).collection("Lend")
+                                                    .document(selectedBookname).update("borrower",user_request.getUser_name())
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "Correspond user accept status successfully updated!");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.d(TAG, "Correspond user accept status failed to updated!");
+                                                        }
+                                                    });
+                                        }
+                                    }
+
+
+                                    //delete all elements in Request array(update request list array) ???
+                                    owner_path.update("requests",null).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                Log.d(TAG, "Remove all users successfully! ");
+                                            }else{
+                                                Log.d(TAG, "Fail to remove all users!");
+                                            }
+                                        }
+                                    });
+                                    Intent return_intent = new Intent();
+                                    setResult(33,return_intent);
+                                    finish();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
