@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
         TextView borrowed_owner_username = view.findViewById(R.id.borrowed_owner_username);
         Button accept_book = view.findViewById(R.id.accept_borrowed_book);
         Button return_book = view.findViewById(R.id.return_borrowed_book);
+        Button cancel_book = view.findViewById(R.id.cancel_borrowed_book);
 
         //the img resourse will be changed later, but now it will just use sample
         borrowed_img.setImageResource(R.mipmap.testimg);
@@ -75,10 +77,12 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
         if(borrowedBook.getStatus().equals("borrowed")){//borrowed
             accept_book.setVisibility(View.GONE);
             return_book.setVisibility(View.VISIBLE);
+            cancel_book.setVisibility(View.GONE);
             map_img.setVisibility(View.INVISIBLE);
         }else if (borrowedBook.getStatus().equals("accepted")){//accepted
             accept_book.setVisibility(View.VISIBLE);
             return_book.setVisibility(View.GONE);
+            cancel_book.setVisibility(View.GONE);
             map_img.setVisibility(View.VISIBLE);
 
 
@@ -91,7 +95,8 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     db.collection("User")
                             .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
-                            .document(borrowedBook.getTitle()).collection("location").document("latLon").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            .document(borrowedBook.getTitle()).collection("location").document("latLon")
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()) {
@@ -143,7 +148,37 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
         }else{//requested, but not accept
             accept_book.setVisibility(View.GONE);
             return_book.setVisibility(View.GONE);
+            cancel_book.setVisibility(View.VISIBLE);
             map_img.setVisibility(View.GONE);
+            cancel_book.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {//cancel the book that requested
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    //delete it in borrower's list
+                    db.collection("User")
+                            .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
+                            .document(borrowedBook.getTitle()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull  Task<Void> task) {
+                            if(task.isSuccessful()){Log.d(TAG,"delete request in borrower's list");}
+                            else{Log.d(TAG,"Fail to delete request in borrower's list");}
+                        }
+                    });
+
+                    //delete the borrower in owner's list
+                    db.collection("User")
+                            .document(borrowedBook.getOwner()).collection("Lend")
+                            .document(borrowedBook.getTitle()).update("requests", FieldValue.arrayRemove(mAuth.getCurrentUser().getUid()))
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){Log.d(TAG,"Delete borrower in owner's list");}
+                                    else{Log.d(TAG,"Fail to delete borrower in owner's list");}
+                                }
+                            });
+                }
+            });
         }
 
         return view;
