@@ -99,9 +99,8 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
                                                 //find the owner uid, thus use it for mauth.email
                                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                                     if (document.getId().equals(ownerName)){//owner name match the owner, alert box
-                                                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                                        String ownerUid = document.getId();
-                                                        String email = mAuth.getCurrentUser().getEmail();
+
+                                                        String email = document.get("Email").toString();
                                                         builder = new AlertDialog.Builder(context);
                                                         builder.setMessage("Email: "+email);
                                                         //Creating dialog box

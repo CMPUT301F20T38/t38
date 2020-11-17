@@ -1,5 +1,6 @@
 package com.example.booker.data;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
@@ -24,6 +25,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +42,8 @@ public class SearchListViewAdapter extends BaseAdapter {
     private FirebaseFirestore db;
     private Map<String, Object> null_field;//in order to create a document with null field
     private String owner;
+
+    private AlertDialog.Builder builder;
 
     public SearchListViewAdapter(Context context, List<Map<String, Object>> bookList) {
         this.bookList = bookList;
@@ -103,6 +108,33 @@ public class SearchListViewAdapter extends BaseAdapter {
         component.ownerName.setText("owner:"+(String)bookList.get(i).get("owner_name"));
         component.status.setText("status:"+(String)bookList.get(i).get("status"));
 
+        component.ownerName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.collection("User").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //find the owner uid, thus use it for mauth.email
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                if (document.getId().equals(bookList.get(i).get("owner").toString())){//owner name match the owner, alert box
+
+                                    String email = document.get("Email").toString();
+                                    builder = new AlertDialog.Builder(context);
+                                    builder.setMessage("Email: "+email);
+                                    //Creating dialog box
+                                    AlertDialog alert = builder.create();
+                                    alert.show();
+                                    break;
+                                }
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+            }
+        });
 
         request_button = view.findViewById(R.id.request_button);
         final int where = i;
