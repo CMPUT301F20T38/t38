@@ -1,6 +1,7 @@
 package com.example.booker.data;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -51,6 +52,7 @@ public class RequestList extends ArrayAdapter<Request> {
     private FirebaseFirestore db;
 
     private String borrower;
+    private AlertDialog.Builder builder;
 
 
     public RequestList(@NonNull Context context, @NonNull ArrayList<Request> requests) {
@@ -70,7 +72,7 @@ public class RequestList extends ArrayAdapter<Request> {
 
         final Request request = requests.get(position);
 
-        final TextView request_username = view.findViewById(R.id.request_username);
+        TextView request_username = view.findViewById(R.id.request_username);
         TextView request_accept = view.findViewById(R.id.request_accept);
         TextView request_decline = view.findViewById(R.id.request_decline);
 
@@ -89,6 +91,35 @@ public class RequestList extends ArrayAdapter<Request> {
                 }
 
 
+            }
+        });
+
+        //user profile dialog
+        request_username.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.collection("User").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //find the owner uid, thus use it for mauth.email
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                if (document.getId().equals(request.getUser_name())){//owner name match the owner, alert box
+
+                                    String email = document.get("Email").toString();
+                                    builder = new AlertDialog.Builder(context);
+                                    builder.setMessage("Email: "+email);
+                                    //Creating dialog box
+                                    AlertDialog alert = builder.create();
+                                    alert.show();
+                                    break;
+                                }
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
             }
         });
 
