@@ -58,7 +58,6 @@ public class OwnerListViewAdapter extends ArrayAdapter<Book> {
         title.setText(book.getTitle());
         ISBN.setText(book.getISBN());
         tag.setText("");
-        borrower.setText(book.getBorrower());
         status.setText(book.getStatus());
 
         return view;

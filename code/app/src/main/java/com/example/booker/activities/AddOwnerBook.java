@@ -26,6 +26,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Yee's Part
@@ -47,7 +48,7 @@ public class AddOwnerBook extends AppCompatActivity {
     private Button btnComfirm;
     private Button btnGallary;
     private ImageView photo;
-    private ImageView add_ISBN;
+    private ImageView addISBN;
     private Uri filePath;
 
     final static String TAG ="image";
@@ -76,7 +77,7 @@ public class AddOwnerBook extends AppCompatActivity {
         ISBN = (EditText) findViewById(R.id.owner_add_ISBN);
         btnComfirm = (Button) findViewById(R.id.owner_add_confirm);
         photo = findViewById(R.id.photoView);
-        add_ISBN = findViewById(R.id.add_isbn_button);
+        addISBN = findViewById(R.id.add_isbn_button);
         btnGallary = findViewById(R.id.gallery);
 
 
@@ -100,10 +101,10 @@ public class AddOwnerBook extends AppCompatActivity {
                 String addAuthor = author.getText().toString();
                 String addTitle = title.getText().toString();
                 String addISBN = ISBN.getText().toString();
-                CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
-                Book book = new Book(addAuthor, addTitle, addISBN, "avaliable", userId, "");
-
-
+                CollectionReference collectionReference = db.collection("User")
+                        .document(userId).collection("Lend");
+                Book book = new Book(addAuthor, addTitle, addISBN, "available",
+                        userId, "", new ArrayList<>());
 
 
                 collectionReference
@@ -136,7 +137,7 @@ public class AddOwnerBook extends AppCompatActivity {
             }
         });
 
-        add_ISBN.setOnClickListener(new View.OnClickListener() {
+        addISBN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // go to scan isbn activity
@@ -161,6 +162,7 @@ public class AddOwnerBook extends AppCompatActivity {
                         "Select Image from here..."),
                 PICK_IMAGE_REQUEST);
     }
+
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode,

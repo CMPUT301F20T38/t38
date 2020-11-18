@@ -15,12 +15,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.booker.R;
 import com.example.booker.data.Book;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.w3c.dom.Document;
+
+import java.util.ArrayList;
 
 /**
  * Yee's Part
@@ -144,22 +151,62 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d("Owner's delete book", "Is Clicked");
-                collectionReference
-                        .document(book.getTitle())
-                        .delete()
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(book.getTitle(), "Delete");
+                String preTile = book.getTitle();
+
+                collectionReference.document(preTile).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        Log.d("Asap", "Rocky");
+                        if (task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if (documentSnapshot.exists()){
+                                ArrayList<String> uidList = (ArrayList<String>) documentSnapshot.get("requests");
+                                Log.d("Request Users", uidList.toString());
+
+                                if (uidList.size() != 0) {
+                                    for (int i = 0; i < uidList.size(); i++) {
+                                        CollectionReference userBorrowed = db
+                                                .collection("User")
+                                                .document(uidList.get(i))
+                                                .collection("Borrowed");
+                                        userBorrowed
+                                                .document(preTile)
+                                                .delete()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d("Borrower Book", "Deleted");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.d("Borrower Book", "Delete Fail");
+                                                    }
+                                                });
+                                    }
+                                }
+
+                                collectionReference
+                                        .document(preTile)
+                                        .delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(book.getTitle(), "Delete");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.d(book.getTitle(), "Delete Fail");
+                                            }
+                                        });
+                                finish();
                             }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(book.getTitle(), "Delete Fail");
-                            }
-                        });
-                finish();
+                        }
+                    }
+                });
             }
         });
 
