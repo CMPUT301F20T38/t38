@@ -162,16 +162,6 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                                                                                 @Override
                                                                                 public void onSuccess(Void aVoid) {
                                                                                     Log.d("Prev book", "Deleted");
-
-                                                                                    collectionReference
-                                                                                            .document(prevTitle)
-                                                                                            .delete();
-
-                                                                                    collectionReference
-                                                                                            .document(book.getTitle())
-                                                                                            .set(book);
-
-                                                                                    finish();
                                                                                 }
                                                                             })
                                                                             .addOnFailureListener(new OnFailureListener() {
@@ -192,6 +182,15 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                                             }
                                         });
                                     }
+                                    collectionReference
+                                            .document(prevTitle)
+                                            .delete();
+
+                                    collectionReference
+                                            .document(book.getTitle())
+                                            .set(book);
+
+                                    finish();
                                 }
                             }
                         }
