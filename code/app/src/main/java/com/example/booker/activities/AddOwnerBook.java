@@ -46,7 +46,7 @@ public class AddOwnerBook extends AppCompatActivity {
     private EditText title;
     private EditText ISBN;
     private Button btnComfirm;
-    private Button btnGallary;
+
     private ImageView photo;
     private ImageView addISBN;
     private Uri filePath;
@@ -78,7 +78,7 @@ public class AddOwnerBook extends AppCompatActivity {
         btnComfirm = (Button) findViewById(R.id.owner_add_confirm);
         photo = findViewById(R.id.photoView);
         addISBN = findViewById(R.id.add_isbn_button);
-        btnGallary = findViewById(R.id.gallery);
+
 
 
         if (author.toString().isEmpty()){
@@ -127,10 +127,11 @@ public class AddOwnerBook extends AppCompatActivity {
             }
         });
 
-        btnGallary.setOnClickListener(new View.OnClickListener() {
+
+
+        photo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Log.d(TAG,"  pick the pic");
                 SelectImage();
                 Log.d(TAG,"  finshed the picking");
