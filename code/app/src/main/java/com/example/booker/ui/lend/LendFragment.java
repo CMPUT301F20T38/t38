@@ -99,7 +99,7 @@ public class LendFragment extends Fragment {
                                     for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
                                         if (documentSnapshot.get("status").toString().equals(selectedStatus)){
                                             Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
-                                                    documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
+                                                    documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"), new ArrayList<>());
                                             bookList.add(book);
                                             Log.d(documentSnapshot.get("title").toString(), "added");
                                         }
@@ -119,7 +119,7 @@ public class LendFragment extends Fragment {
                                     Log.d("Filter", "Begin Fetching All");
                                     for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                                         Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
-                                                documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
+                                                documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"), new ArrayList<>());
                                         bookList.add(book);
                                         Log.d(documentSnapshot.get("title").toString(), "added");
                                     }
@@ -178,7 +178,7 @@ public class LendFragment extends Fragment {
                     if (value != null) {
                         for (DocumentSnapshot documentSnapshot : value) {
                             Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
-                                    documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"));
+                                    documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"), new ArrayList<>());
                             bookList.add(book);
                             Log.d(documentSnapshot.get("title").toString(), "added");
                         }

@@ -1,31 +1,43 @@
 package com.example.booker.activities;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.booker.R;
 import com.example.booker.data.Book;
+import com.example.booker.data.UploadImage;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Yee's Part
@@ -45,10 +57,16 @@ public class AddOwnerBook extends AppCompatActivity {
     private EditText title;
     private EditText ISBN;
     private Button btnComfirm;
-    private Button btnGallary;
+
     private ImageView photo;
-    private ImageView add_ISBN;
+    private ImageView addISBN;
     private Uri filePath;
+    private StorageTask mUploadTask;
+    private String downloadUrl;
+    private DatabaseReference mDatabaseRef;
+    private EditText mEditTextFileName;
+    private ProgressBar mProgressBar;
+    private String bookISBN;
 
     final static String TAG ="image";
     private final int PICK_IMAGE_REQUEST = 22;
@@ -76,8 +94,15 @@ public class AddOwnerBook extends AppCompatActivity {
         ISBN = (EditText) findViewById(R.id.owner_add_ISBN);
         btnComfirm = (Button) findViewById(R.id.owner_add_confirm);
         photo = findViewById(R.id.photoView);
-        add_ISBN = findViewById(R.id.add_isbn_button);
-        btnGallary = findViewById(R.id.gallery);
+        addISBN = findViewById(R.id.add_isbn_button);
+
+        mEditTextFileName = findViewById(R.id.owner_add_title);
+        mProgressBar = findViewById(R.id.add_progress_bar);
+
+        storageReference = FirebaseStorage.getInstance().getReference("uploadImage");
+        mDatabaseRef= FirebaseDatabase.getInstance().getReference("uploadImage");
+
+
 
 
         if (author.toString().isEmpty()){
@@ -100,10 +125,15 @@ public class AddOwnerBook extends AppCompatActivity {
                 String addAuthor = author.getText().toString();
                 String addTitle = title.getText().toString();
                 String addISBN = ISBN.getText().toString();
-                CollectionReference collectionReference = db.collection("User").document(userId).collection("Lend");
-                Book book = new Book(addAuthor, addTitle, addISBN, "avaliable", userId, "");
+                CollectionReference collectionReference = db.collection("User")
+                        .document(userId).collection("Lend");
+                Book book = new Book(addAuthor, addTitle, addISBN, "available",
+                        userId, "", new ArrayList<>());
+                bookISBN = ISBN.getText().toString();
+                if(bookISBN.length()>0){
 
-
+                    uploadImage();
+                }
 
 
                 collectionReference
@@ -126,17 +156,18 @@ public class AddOwnerBook extends AppCompatActivity {
             }
         });
 
-        btnGallary.setOnClickListener(new View.OnClickListener() {
+
+
+        photo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Log.d(TAG,"  pick the pic");
                 SelectImage();
                 Log.d(TAG,"  finshed the picking");
             }
         });
 
-        add_ISBN.setOnClickListener(new View.OnClickListener() {
+        addISBN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // go to scan isbn activity
@@ -161,6 +192,106 @@ public class AddOwnerBook extends AppCompatActivity {
                         "Select Image from here..."),
                 PICK_IMAGE_REQUEST);
     }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    private void uploadImage()
+    {
+        if (filePath != null) {
+
+            // Code for showing progressDialog while uploading
+//            final ProgressDialog progressDialog
+//                    = new ProgressDialog(this);
+//            progressDialog.setTitle("Uploading...");
+//            progressDialog.show();
+
+            // Defining the child of storageReference
+            StorageReference imageRef
+                    = storageReference
+                    .child(
+                            bookISBN+"/"
+                                    + System.currentTimeMillis()
+                                    + "." + getFileExtension(filePath));
+
+            // adding listeners on upload
+            // or failure of image
+            mUploadTask=imageRef.putFile(filePath)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot){
+
+                                    // Image uploaded successfully
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mProgressBar.setProgress(0);
+                                        }
+                                    }, 500);
+                                    // Dismiss dialog
+//                                    progressDialog.dismiss();
+
+                                    Toast.makeText(AddOwnerBook.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
+                                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            downloadUrl = uri.toString();
+                                            //push to database
+                                            UploadImage upload = new UploadImage( mEditTextFileName.getText().toString().trim(),
+                                                    downloadUrl);
+
+                                            Log.d(TAG, "name   "+mEditTextFileName.getText().toString().trim());
+                                            Log.d(TAG, "URL   "+taskSnapshot.getUploadSessionUri().toString());
+                                            String uploadId = mDatabaseRef.push().getKey();
+                                            Log.d(TAG, "uploadId   "+uploadId);
+
+                                            mDatabaseRef.child(bookISBN).child(uploadId).setValue(upload);
+
+                                        }
+                                    });
+
+                                }
+                            })
+
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                            // Error, Image not uploaded
+//                            progressDialog.dismiss();
+                            Toast
+                                    .makeText(AddOwnerBook.this,
+                                            "Failed " + e.getMessage(),
+                                            Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    })
+                    .addOnProgressListener(
+                            new OnProgressListener<UploadTask.TaskSnapshot>() {
+
+                                // Progress Listener for loading
+                                // percentage on the dialog box
+                                @Override
+                                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                                    mProgressBar.setProgress((int) progress);
+//                                    progressDialog.setMessage(
+//                                            "Uploaded "
+//                                                    + (int)progress + "%");
+                                }
+                            });
+
+        }
+
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode,

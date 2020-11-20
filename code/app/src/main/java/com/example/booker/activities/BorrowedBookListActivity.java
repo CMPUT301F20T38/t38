@@ -102,7 +102,9 @@ public class BorrowedBookListActivity extends AppCompatActivity {
                                             String status = (String)doc.getData().get("status");
                                             String ISBN = (String)doc.getData().get("ISBN");
                                             String borrower = (String)doc.getData().get("borrower");
-                                            borrowedBooksList.add(new BorrowedBooks(author, title, ISBN, status, owner, borrower, src));
+                                            borrowedBooksList.add(new BorrowedBooks(author, title,
+                                                    ISBN, status, owner, borrower,
+                                                    new ArrayList<>(), src));
                                         }
                                         borrowedBooksAdapter.notifyDataSetChanged();
                                     }

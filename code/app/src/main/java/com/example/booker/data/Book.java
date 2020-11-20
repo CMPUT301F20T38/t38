@@ -3,6 +3,7 @@ package com.example.booker.data;
 import android.util.Log;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Book class that have attribute
@@ -22,14 +23,17 @@ public class Book implements Serializable {
     private String status;
     private String owner;
     private String borrower;
+    private ArrayList<String> requests;
 
-    public Book(String author, String title, String ISBN, String status, String owner, String borrower) {
+    public Book(String author, String title, String ISBN, String status, String owner,
+                String borrower, ArrayList<String> requests) {
         this.author = author;
         this.title = title;
         this.ISBN = ISBN;
         this.status = status;
         this.owner = owner;
         this.borrower = borrower;
+        this.requests = requests;
     }
 
     public Book(){}
@@ -80,5 +84,9 @@ public class Book implements Serializable {
 
     public String getBorrower() {
         return borrower;
+    }
+
+    public ArrayList<String> getRequests() {
+        return requests;
     }
 }
