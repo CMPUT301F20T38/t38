@@ -19,6 +19,7 @@ import com.example.booker.R;
 import com.example.booker.activities.UserSignUp;
 import com.example.booker.data.OwnerListViewAdapter;
 import com.example.booker.data.SearchListViewAdapter;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -56,6 +57,7 @@ public class BorrowFragment extends Fragment {
     private String ownerusername;
     private ArrayList<String> userids;
     private List<Map<String, Object>> booklist;
+    private LatLng locaiton = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle saveInstanceState) {
@@ -199,10 +201,12 @@ public class BorrowFragment extends Fragment {
                                         map.put("author", document.getString("author"));
                                         map.put("title", document.getString("title"));
                                         map.put("ISBN", document.getString("isbn"));
+                                        map.put("location",document.getString("status") );
 
                                         map.put("owner",document.getString("owner"));
                                         map.put("owner_name", finalUsermap1.get(uid).toString());
                                         map.put("status",document.getString("status"));
+
 
 
 
@@ -213,6 +217,8 @@ public class BorrowFragment extends Fragment {
                                         }
 
                                         //upadate booklist
+
+
 
                                         searchAdapter = new SearchListViewAdapter(getContext(),booklist);
                                         searchList.setAdapter(searchAdapter);

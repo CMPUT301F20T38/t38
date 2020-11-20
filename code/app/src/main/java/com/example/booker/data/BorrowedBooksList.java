@@ -3,6 +3,7 @@ package com.example.booker.data;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * BorrowedBooksList class is the adapter for Borrowed Book List, the function of it
@@ -139,15 +141,19 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
                                         FirebaseFirestore db = FirebaseFirestore.getInstance();
                                         db.collection("User")
                                                 .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
-                                                .document(borrowedBook.getTitle()).collection("location").document("latLon")
+                                                .document(borrowedBook.getTitle())
                                                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 if (task.isSuccessful()) {
                                                     // Document found in the offline cache
                                                     DocumentSnapshot document = task.getResult();
-                                                    Double lat= document.getDouble("latitude");
-                                                    Double lon= document.getDouble("longitude");
+
+                                                    Map data = (Map) document.get("location");
+
+                                                    Double lat = (Double) data.get("latitude");
+                                                    Double lon = (Double) data.get("longitude");
+
                                                     Log.d(TAG, "Cached document data lat: " + lat);
                                                     Log.d(TAG, "Cached document data lon : " + lon);
 

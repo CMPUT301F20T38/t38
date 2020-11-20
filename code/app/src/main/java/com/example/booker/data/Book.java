@@ -2,6 +2,8 @@ package com.example.booker.data;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -24,6 +26,8 @@ public class Book implements Serializable {
     private String owner;
     private String borrower;
     private ArrayList<String> requests;
+
+
 
     public Book(String author, String title, String ISBN, String status, String owner,
                 String borrower, ArrayList<String> requests) {
@@ -62,6 +66,8 @@ public class Book implements Serializable {
         this.borrower = borrower;
     }
 
+
+
     public String getAuthor() {
         return author;
     }
@@ -89,4 +95,5 @@ public class Book implements Serializable {
     public ArrayList<String> getRequests() {
         return requests;
     }
+
 }
