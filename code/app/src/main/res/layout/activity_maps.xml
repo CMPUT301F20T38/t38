@@ -34,10 +34,9 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_marginTop="77dp"
-        android:layout_marginEnd="142dp"
-        android:layout_marginRight="142dp"
+        android:layout_marginEnd="156dp"
+        android:layout_marginRight="156dp"
 
-        android:text="Set this location"
-        />
+        android:text="Set this location" />
 
 </RelativeLayout>

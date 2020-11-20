@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 
 import com.example.booker.R;
 import com.example.booker.ui.borrow.BorrowFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -50,6 +51,7 @@ public class SearchListViewAdapter extends BaseAdapter {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
 
+
     }
 
     public class Component{
@@ -59,12 +61,14 @@ public class SearchListViewAdapter extends BaseAdapter {
         public TextView ownerTag;
         public TextView ownerName;
         public TextView status;
+        public LatLng location;
     }
 
     @Override
     public int getCount() {
         Log.d("BOOK SIZE", bookList.toString());
         return bookList.size();
+
     }
 
     @Override
@@ -145,6 +149,7 @@ public class SearchListViewAdapter extends BaseAdapter {
                     Toast.makeText(view.getContext(), "Please log in first!", Toast.LENGTH_SHORT).show();
                 }else{
                     //add the book to the borrowed books of current user
+                    bookList.get(where).put("location", 0);
                     db.collection("User").document(mAuth.getCurrentUser()
                             .getUid()).collection("Borrowed").document(bookList.get(where).get("title").toString())
                             .set(bookList.get(where))
