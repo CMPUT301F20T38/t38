@@ -36,7 +36,6 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
     private final String TAG="Scanner";
     private FirebaseAuth mAuth;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

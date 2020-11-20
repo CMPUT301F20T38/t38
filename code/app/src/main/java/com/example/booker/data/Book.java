@@ -27,8 +27,6 @@ public class Book implements Serializable {
     private String borrower;
     private ArrayList<String> requests;
 
-
-
     public Book(String author, String title, String ISBN, String status, String owner,
                 String borrower, ArrayList<String> requests) {
         this.author = author;
@@ -95,5 +93,4 @@ public class Book implements Serializable {
     public ArrayList<String> getRequests() {
         return requests;
     }
-
 }
