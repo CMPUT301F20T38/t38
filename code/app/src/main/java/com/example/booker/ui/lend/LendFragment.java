@@ -101,6 +101,7 @@ public class LendFragment extends Fragment {
                                             Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
                                                     documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"), new ArrayList<>());
                                             bookList.add(book);
+
                                             Log.d(documentSnapshot.get("title").toString(), "added");
                                         }
                                     }

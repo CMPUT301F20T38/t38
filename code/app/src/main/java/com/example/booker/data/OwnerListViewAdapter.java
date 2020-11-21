@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.booker.R;
+import com.nostra13.universalimageloader.utils.L;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,14 +52,12 @@ public class OwnerListViewAdapter extends ArrayAdapter<Book> {
         TextView author = view.findViewById(R.id.owner_book_author);
         TextView title = view.findViewById(R.id.owner_book_title);
         TextView ISBN = view.findViewById(R.id.owner_book_ISBN);
-        TextView tag = view.findViewById(R.id.owner_borrower_tag);
         TextView borrower = view.findViewById(R.id.owner_borrower_name);
         TextView status = view.findViewById(R.id.owner_book_status);
 
         author.setText(book.getAuthor());
         title.setText(book.getTitle());
         ISBN.setText(book.getISBN());
-        tag.setText("");
         status.setText(book.getStatus());
 
         return view;
