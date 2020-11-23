@@ -2,6 +2,8 @@ package com.example.booker.data;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -61,6 +63,8 @@ public class Book implements Serializable {
     public void setBorrower(String borrower) {
         this.borrower = borrower;
     }
+
+
 
     public String getAuthor() {
         return author;

@@ -1,6 +1,8 @@
 package com.example.booker.activities;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +21,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class DisplayMapActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -71,10 +77,24 @@ public class DisplayMapActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap1 = googleMap;
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(selectedLat, selectedLon, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mMap1.getUiSettings().setZoomControlsEnabled(true);
+        mMap1.getUiSettings().setMapToolbarEnabled(true);
+//        mMap1.getUiSettings().set;
+
+
 
         // Add a marker in Sydney and move the camera
         LatLng borrow_UA = new LatLng(selectedLat, selectedLon);
-        mMap1.addMarker(new MarkerOptions().position(borrow_UA).title("Go to this location for pick up").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+        mMap1.addMarker(new MarkerOptions().position(borrow_UA).title(addresses.get(0).getAddressLine(0)).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
         mMap1.moveCamera(CameraUpdateFactory.newLatLngZoom(borrow_UA,16));
     }
 }

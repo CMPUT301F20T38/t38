@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -56,7 +57,7 @@ import java.util.Map;
 
 public class LendFragment extends Fragment {
 
-    private Button btnAdd;
+    private ImageView btnAdd;
     private Spinner filter;
     private ListView ownerList;
     private OwnerListViewAdapter ownerAdapter;
@@ -71,7 +72,7 @@ public class LendFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
-        btnAdd = (Button) root.findViewById(R.id.owner_book_add);
+        btnAdd = (ImageView) root.findViewById(R.id.owner_book_add);
         filter = (Spinner) root.findViewById(R.id.owner_book_filter);
         ownerList = (ListView) root.findViewById(R.id.owner_book_list);
 
@@ -101,6 +102,7 @@ public class LendFragment extends Fragment {
                                             Book book = new Book(documentSnapshot.getString("author"), documentSnapshot.getString("title"), documentSnapshot.getString("isbn"),
                                                     documentSnapshot.getString("status"), userId, documentSnapshot.getString("borrower"), new ArrayList<>());
                                             bookList.add(book);
+
                                             Log.d(documentSnapshot.get("title").toString(), "added");
                                         }
                                     }
