@@ -24,9 +24,6 @@
             android:value="@string/maps_api_key" />
 
         <activity
-            android:name=".activities.RequestListActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".activities.BorrowedBookListActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -53,6 +50,7 @@
             android:name=".activities.Photograph"
             android:label="Maps2" />
         <activity android:name=".activities.EditDeleteOwnerBook" />
+
     </application>
 
 </manifest>

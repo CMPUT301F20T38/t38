@@ -8,11 +8,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -58,6 +62,7 @@ public class AddOwnerBook extends AppCompatActivity {
     private EditText ISBN;
     private Button btnComfirm;
 
+
     private ImageView photo;
     private ImageView addISBN;
     private Uri filePath;
@@ -95,6 +100,7 @@ public class AddOwnerBook extends AppCompatActivity {
         btnComfirm = (Button) findViewById(R.id.owner_add_confirm);
         photo = findViewById(R.id.photoView);
         addISBN = findViewById(R.id.add_isbn_button);
+
 
         mEditTextFileName = findViewById(R.id.owner_add_title);
         mProgressBar = findViewById(R.id.add_progress_bar);
@@ -161,11 +167,22 @@ public class AddOwnerBook extends AppCompatActivity {
         photo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG,"  pick the pic");
-                SelectImage();
-                Log.d(TAG,"  finshed the picking");
+                showPopueWindow();
+
+
+
+
+                //Log.d(TAG,"  pick the pic");
+                //SelectImage();
+                //Log.d(TAG,"  finshed the picking");
             }
+
+
         });
+
+
+        
+        
 
         addISBN.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,7 +195,15 @@ public class AddOwnerBook extends AppCompatActivity {
             }
         });
 
+
+
+
+
     }
+
+
+
+
 
     private void SelectImage() {
 
@@ -192,6 +217,59 @@ public class AddOwnerBook extends AppCompatActivity {
                         "Select Image from here..."),
                 PICK_IMAGE_REQUEST);
     }
+
+    private void showPopueWindow(){
+        View popView = View.inflate(this,R.layout.popup_window,null);
+        Button bt_album = (Button) popView.findViewById(R.id.btn_pop_album);
+        Button bt_camera = (Button) popView.findViewById(R.id.btn_pop_camera);
+        Button bt_cancle = (Button) popView.findViewById(R.id.btn_pop_cancel);
+        //get height and width
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels*1/3;
+
+        final PopupWindow popupWindow = new PopupWindow(popView,width,height);
+
+        popupWindow.setFocusable(true);
+        //popWindow dismiss if click outside
+        popupWindow.setOutsideTouchable(true);
+
+        bt_album.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SelectImage();
+                popupWindow.dismiss();
+            }
+        });
+
+
+
+        bt_cancle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+
+            }
+        });
+        //popupWindow not translucent
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                WindowManager.LayoutParams lp = getWindow().getAttributes();
+                lp.alpha = 1.0f;
+                getWindow().setAttributes(lp);
+            }
+        });
+
+        //translucent
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = 0.5f;
+        getWindow().setAttributes(lp);
+        popupWindow.showAtLocation(popView, Gravity.BOTTOM,0,50);
+
+    }
+
+
+
 
     private String getFileExtension(Uri uri) {
         ContentResolver cR = getContentResolver();
