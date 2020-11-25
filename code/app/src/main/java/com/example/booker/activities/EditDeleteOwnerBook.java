@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,7 +47,8 @@ import java.util.ArrayList;
 public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
-    private Button btnPhoto, btnEdit, btnDelete, btnRequest;
+    private Button btnEdit, btnDelete;
+    private ImageView btnPhoto, btnReturn, btnLocation, btnRequest;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -74,8 +76,10 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
         btnEdit = (Button) findViewById(R.id.owner_edit_btn);
         btnDelete = (Button) findViewById(R.id.owner_delete_btn);
-        btnRequest = (Button) findViewById(R.id.owner_show_request);
-        btnPhoto = (Button) findViewById(R.id.owner_add_photo);
+        btnRequest = (ImageView) findViewById(R.id.owner_show_request);
+        btnPhoto = (ImageView) findViewById(R.id.owner_add_photo);
+        btnLocation = (ImageView) findViewById(R.id.owner_map_change);
+        btnReturn = (ImageView) findViewById(R.id.owner_return);
 
         editTitle.setText(title);
         editAuthor.setText(author);
@@ -97,9 +101,6 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                 Log.d("photo: BOOK ISBN", ISBN );
 
                 startActivity(goToPhoto);
-
-
-
             }
         });
 
