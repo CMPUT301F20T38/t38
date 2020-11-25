@@ -15,7 +15,7 @@
             android:id="@+id/btn_pop_album"
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:text="本地相册"
+            android:text="Album"
             android:background="#ffff"
             android:textSize="18sp" />
 
@@ -23,7 +23,7 @@
             android:id="@+id/btn_pop_camera"
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:text="相机拍摄"
+            android:text="Camera"
             android:background="#ffff"
             android:textSize="18sp" />
 
@@ -33,7 +33,7 @@
             android:layout_height="45dp"
             android:layout_marginTop="10dp"
             android:background="#ffff"
-            android:text="取消"
+            android:text="Cancel"
             android:textSize="18sp" />
     </LinearLayout>
 
