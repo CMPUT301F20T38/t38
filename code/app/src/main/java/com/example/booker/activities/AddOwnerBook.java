@@ -1,5 +1,6 @@
 package com.example.booker.activities;
 
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,13 +27,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.booker.R;
 import com.example.booker.data.Book;
 import com.example.booker.data.UploadImage;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -42,6 +46,8 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Yee's Part
@@ -73,6 +79,8 @@ public class AddOwnerBook extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private String bookISBN;
 
+
+
     final static String TAG ="image";
     private final int PICK_IMAGE_REQUEST = 22;
     private final int GET_ISBN = 33;//request code for isbn
@@ -82,6 +90,8 @@ public class AddOwnerBook extends AppCompatActivity {
     FirebaseStorage storage;
     StorageReference storageReference;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -89,8 +99,7 @@ public class AddOwnerBook extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        final String userId = user.getUid();
+
 
         Intent intent = getIntent();
 
@@ -127,36 +136,12 @@ public class AddOwnerBook extends AppCompatActivity {
         btnComfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                String addAuthor = author.getText().toString();
-                String addTitle = title.getText().toString();
-                String addISBN = ISBN.getText().toString();
-                CollectionReference collectionReference = db.collection("User")
-                        .document(userId).collection("Lend");
-                Book book = new Book(addAuthor, addTitle, addISBN, "available",
-                        userId, "", new ArrayList<>());
-                bookISBN = ISBN.getText().toString();
-                if(bookISBN.length()>0){
-
+                if (filePath == null){
+                    uploadInf();
+                }
+                if (filePath!=null){
                     uploadImage();
                 }
-
-
-                collectionReference
-                        .document(addTitle)
-                        .set(book)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                finish();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("Add Data Firestore", "Failed");
-                            }
-                        });
 
 
             }
@@ -282,10 +267,10 @@ public class AddOwnerBook extends AppCompatActivity {
         if (filePath != null) {
 
             // Code for showing progressDialog while uploading
-//            final ProgressDialog progressDialog
-//                    = new ProgressDialog(this);
-//            progressDialog.setTitle("Uploading...");
-//            progressDialog.show();
+            final ProgressDialog progressDialog
+                    = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading...");
+            progressDialog.show();
 
             // Defining the child of storageReference
             StorageReference imageRef
@@ -313,7 +298,8 @@ public class AddOwnerBook extends AppCompatActivity {
                                         }
                                     }, 500);
                                     // Dismiss dialog
-//                                    progressDialog.dismiss();
+                                    progressDialog.dismiss();
+                                    uploadInf();
 
                                     Toast.makeText(AddOwnerBook.this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
                                     imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -324,12 +310,85 @@ public class AddOwnerBook extends AppCompatActivity {
                                             UploadImage upload = new UploadImage( mEditTextFileName.getText().toString().trim(),
                                                     downloadUrl);
 
-                                            Log.d(TAG, "name   "+mEditTextFileName.getText().toString().trim());
-                                            Log.d(TAG, "URL   "+taskSnapshot.getUploadSessionUri().toString());
-                                            String uploadId = mDatabaseRef.push().getKey();
+//                                            Log.d(TAG, "name   "+mEditTextFileName.getText().toString().trim());
+//                                            Log.d(TAG, "URL   "+taskSnapshot.getUploadSessionUri().toString());
+
+
+                                            String uploadId =  System.currentTimeMillis()+"Key";
                                             Log.d(TAG, "uploadId   "+uploadId);
 
-                                            mDatabaseRef.child(bookISBN).child(uploadId).setValue(upload);
+                                            Map<String, Object> docData = new HashMap<>();
+
+                                            Map<String, Object> nestedData = new HashMap<>();
+
+                                            nestedData.put("Url",downloadUrl);
+                                            nestedData.put("Name",mEditTextFileName.getText().toString().trim());
+
+                                            docData.put(uploadId,nestedData);
+
+                                            db.collection("UploadImages").document(bookISBN)
+                                                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        DocumentSnapshot document = task.getResult();
+                                                        if (document.exists()) {
+
+                                                            db.collection("UploadImages").document(bookISBN)
+                                                                    .update(docData)
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Log.d(TAG, "URl and name  successfully written!");
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.w(TAG, "Error writing uploading URl and name", e);
+                                                                        }
+                                                                    });
+
+                                                        } else {
+                                                            Log.d(TAG, "No such document");
+                                                            db.collection("UploadImages").document(bookISBN)
+                                                                    .set(docData)
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Log.d(TAG, "URl and name  successfully written!");
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.w(TAG, "Error writing uploading URl and name", e);
+                                                                        }
+                                                                    });
+                                                        }
+                                                    } else {
+                                                        Log.d(TAG, "get failed with ", task.getException());
+                                                    }
+                                                }
+                                            });
+
+
+                                            db.collection("UploadImages").document(bookISBN)
+                                                    .update(docData)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "URl and name  successfully written!");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w(TAG, "Error writing uploading URl and name", e);
+                                                        }
+                                                    });
+
+//                                            mDatabaseRef.child(bookISBN).child(uploadId).setValue(upload);
 
                                         }
                                     });
@@ -342,7 +401,7 @@ public class AddOwnerBook extends AppCompatActivity {
                         public void onFailure(@NonNull Exception e) {
 
                             // Error, Image not uploaded
-//                            progressDialog.dismiss();
+                            progressDialog.dismiss();
                             Toast
                                     .makeText(AddOwnerBook.this,
                                             "Failed " + e.getMessage(),
@@ -358,18 +417,57 @@ public class AddOwnerBook extends AppCompatActivity {
                                 @Override
                                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                                     double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                                    mProgressBar.setProgress((int) progress);
-//                                    progressDialog.setMessage(
-//                                            "Uploaded "
-//                                                    + (int)progress + "%");
+//                                    mProgressBar.setProgress((int) progress);
+                                    progressDialog.setMessage(
+                                            "Uploaded "
+                                                    + (int)progress + "%");
                                 }
                             });
 
         }
-
+        else{
+            Toast.makeText(this,"No file selected", Toast.LENGTH_LONG).show();
+        }
 
     }
 
+    private void uploadInf(){
+        FirebaseUser user = mAuth.getCurrentUser();
+        final String userId = user.getUid();
+
+        String addAuthor = author.getText().toString();
+        String addTitle = title.getText().toString();
+        String addISBN = ISBN.getText().toString();
+        CollectionReference collectionReference = db.collection("User")
+                .document(userId).collection("Lend");
+        Book book = new Book(addAuthor, addTitle, addISBN, "available",
+                userId, "", new ArrayList<>());
+        bookISBN = ISBN.getText().toString();
+        if(bookISBN.length()>0){
+
+            uploadImage();
+        }
+
+
+        collectionReference
+                .document(addTitle)
+                .set(book)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Add Data Firestore", "Failed");
+                    }
+                });
+
+
+
+    }
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode,
