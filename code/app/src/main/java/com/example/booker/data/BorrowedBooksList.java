@@ -74,6 +74,7 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
         Button cancel_book = view.findViewById(R.id.cancel_borrowed_book);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        //find the borrower's path, check if it exists
         db.collection("User").document(borrowedBook.getOwner()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -125,6 +126,33 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
                                 return_book.setVisibility(View.VISIBLE);
                                 cancel_book.setVisibility(View.GONE);
                                 map_img.setVisibility(View.INVISIBLE);
+
+                                //set the click listener on return button
+                                return_book.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                        db.collection("User")
+                                                .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
+                                                .document(borrowedBook.getTitle())
+                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull  Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    Intent intent = new Intent(context.getApplicationContext(), ScanCodeActivity.class);
+                                                    //set the path to the user's book, also delete borrower's document
+                                                    intent.putExtra("event","return_book");
+                                                    intent.putExtra("book",borrowedBook.getTitle());
+                                                    intent.putExtra("owner",borrowedBook.getOwner());
+                                                    intent.putExtra("borrower",mAuth.getCurrentUser().getUid());
+                                                    intent.putExtra("isbn",borrowedBook.getISBN());
+                                                    context.startActivity(intent);
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
                             }else if (borrowedBook.getStatus().equals("accepted")){//accepted
                                 accept_book.setVisibility(View.VISIBLE);
                                 return_book.setVisibility(View.GONE);
