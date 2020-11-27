@@ -141,6 +141,66 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                         }
                     });
 
+        }else if(event.equals("return_book")){
+            //borrower side return the book
+            //get data from intent
+            String owner  = prev_intent.getStringExtra("owner");
+            String borrower  = prev_intent.getStringExtra("borrower");
+            String book  = prev_intent.getStringExtra("book");
+            String isbn = prev_intent.getStringExtra("isbn");
+            //Log.e("================================================",owner+borrower+book);
+            //firebase path
+            if(result.getText().equals(isbn)){
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("User").document(borrower)
+                        .collection("Borrowed").document(book).delete()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull  Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.d(TAG, "Successfully returned book and delete document");
+                                }else{
+                                    Log.d(TAG, "Return book failed and not delete document: ", task.getException());
+                                }
+                            }
+                        });
+            }
+            finish();
+
+        }else if(event.equals("confirm_returned_book")){
+            //owner side accept returned book
+            //change the book status and borrower
+            String owner  = prev_intent.getStringExtra("owner");
+            String book  = prev_intent.getStringExtra("book");
+            String isbn = prev_intent.getStringExtra("isbn");
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            if(result.getText().equals(isbn)) {
+                db.collection("User").document(owner)
+                        .collection("Lend").document(book).update("status", "available")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull  Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.d(TAG,"Successfully changed the owner book status when accept return");
+                                }else{
+                                    Log.d(TAG,"Failed to change the owner book status when accept return");
+                                }
+                            }
+                        });
+                db.collection("User").document(owner)
+                        .collection("Lend").document(book).update("borrower", "")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull  Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.d(TAG,"Successfully changed the owner book borrower when accept return");
+                                }else{
+                                    Log.d(TAG,"Failed to change the owner book borrower when accept return");
+                                }
+                            }
+                        });
+            }
+            finish();
         }
 
         //onBackPressed();
