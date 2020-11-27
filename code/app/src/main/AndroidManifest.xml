@@ -51,7 +51,7 @@
         <activity android:name=".activities.UserLogin" />
         <activity android:name=".activities.AddOwnerBook" />
         <activity android:name=".activities.MapsActivity" />
-        
+
 
 
 
