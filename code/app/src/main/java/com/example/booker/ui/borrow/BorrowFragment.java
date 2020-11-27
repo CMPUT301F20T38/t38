@@ -56,7 +56,7 @@ public class BorrowFragment extends Fragment {
     private String search_content;
     private String ownerusername;
     private ArrayList<String> userids;
-    private List<Map<String, Object>> booklist;
+    private ArrayList<Map<String, Object>> booklist;
     private LatLng locaiton = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -162,7 +162,7 @@ public class BorrowFragment extends Fragment {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final List<Map<String, Object>> booklist = new ArrayList<Map<String, Object>>();
+                final ArrayList<Map<String, Object>> booklist = new ArrayList<Map<String, Object>>();
 
                 search_content = searchEditText.getText().toString();
 
