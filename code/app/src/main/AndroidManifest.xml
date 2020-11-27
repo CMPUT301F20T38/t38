@@ -51,11 +51,9 @@
         <activity android:name=".activities.UserLogin" />
         <activity android:name=".activities.AddOwnerBook" />
         <activity android:name=".activities.MapsActivity" />
+        
 
-        <activity android:name=".activities.ImagesActivity" />
 
-        <activity android:name=".activities.RequestListActivity"
-                  android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".activities.DisplayMapActivity"
