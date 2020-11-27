@@ -145,6 +145,7 @@ public class AddOwnerBook extends AppCompatActivity {
                     uploadInf();
                 }
                 if (filePath!=null){
+                    bookISBN = ISBN.getText().toString();
                     uploadImage();
                 }
             }
