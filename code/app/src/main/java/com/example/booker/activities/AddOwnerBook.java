@@ -1,11 +1,15 @@
 package com.example.booker.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -23,6 +27,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.example.booker.R;
 import com.example.booker.data.Book;
@@ -44,8 +51,13 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +80,7 @@ public class AddOwnerBook extends AppCompatActivity {
     private EditText ISBN;
     private Button btnComfirm;
 
+    private String currentPhotoPath;
 
     private ImageView photo;
     private ImageView addISBN;
@@ -79,18 +92,15 @@ public class AddOwnerBook extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private String bookISBN;
 
-
-
     final static String TAG ="image";
     private final int PICK_IMAGE_REQUEST = 22;
+    private final int CAMERA = 10;
     private final int GET_ISBN = 33;//request code for isbn
+    int MY_PERMISSIONS_REQUEST_CAMERA=0;
 
     FirebaseAuth mAuth;
     FirebaseFirestore db;
-    FirebaseStorage storage;
     StorageReference storageReference;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -100,9 +110,6 @@ public class AddOwnerBook extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-
-        Intent intent = getIntent();
-
         author = (EditText) findViewById(R.id.owner_add_author);
         title = (EditText) findViewById(R.id.owner_add_title);
         ISBN = (EditText) findViewById(R.id.owner_add_ISBN);
@@ -110,13 +117,11 @@ public class AddOwnerBook extends AppCompatActivity {
         photo = findViewById(R.id.photoView);
         addISBN = findViewById(R.id.add_isbn_button);
 
-
         mEditTextFileName = findViewById(R.id.owner_add_title);
         mProgressBar = findViewById(R.id.add_progress_bar);
 
         storageReference = FirebaseStorage.getInstance().getReference("uploadImage");
         mDatabaseRef= FirebaseDatabase.getInstance().getReference("uploadImage");
-
 
 
 
@@ -142,32 +147,18 @@ public class AddOwnerBook extends AppCompatActivity {
                 if (filePath!=null){
                     uploadImage();
                 }
-
-
             }
         });
-
-
 
         photo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPopueWindow();
-
-
-
-
                 //Log.d(TAG,"  pick the pic");
                 //SelectImage();
                 //Log.d(TAG,"  finshed the picking");
             }
-
-
         });
-
-
-        
-        
 
         addISBN.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,19 +170,9 @@ public class AddOwnerBook extends AppCompatActivity {
                 startActivityForResult(intent, GET_ISBN);//Activity is started with requestCode 33
             }
         });
-
-
-
-
-
     }
 
-
-
-
-
     private void SelectImage() {
-
         // Defining Implicit Intent to mobile gallery
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -201,6 +182,25 @@ public class AddOwnerBook extends AppCompatActivity {
                         intent,
                         "Select Image from here..."),
                 PICK_IMAGE_REQUEST);
+    }
+
+    private void TakeCamera(){
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED);
+        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent,CAMERA);
+
+
+
+
+
+
+
+
     }
 
     private void showPopueWindow(){
@@ -226,7 +226,13 @@ public class AddOwnerBook extends AppCompatActivity {
             }
         });
 
-
+        bt_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TakeCamera();
+                popupWindow.dismiss();
+            }
+        });
 
         bt_cancle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -443,10 +449,7 @@ public class AddOwnerBook extends AppCompatActivity {
         Book book = new Book(addAuthor, addTitle, addISBN, "available",
                 userId, "", new ArrayList<>());
         bookISBN = ISBN.getText().toString();
-        if(bookISBN.length()>0){
 
-            uploadImage();
-        }
 
 
         collectionReference
@@ -464,10 +467,8 @@ public class AddOwnerBook extends AppCompatActivity {
                         Log.d("Add Data Firestore", "Failed");
                     }
                 });
-
-
-
     }
+
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode,
@@ -489,6 +490,8 @@ public class AddOwnerBook extends AppCompatActivity {
 
             // Get the Uri of data
             filePath = data.getData();
+            String a = filePath.toString();
+            ISBN.setText(a);
             try {
 
                 // Setting image on image view using Bitmap
@@ -498,6 +501,7 @@ public class AddOwnerBook extends AppCompatActivity {
                         .getBitmap(
                                 getContentResolver(),
                                 filePath);
+
                 photo.setImageBitmap(bitmap);
             }
 
@@ -505,9 +509,33 @@ public class AddOwnerBook extends AppCompatActivity {
                 // Log the exception
                 e.printStackTrace();
             }
-        }else if(requestCode == GET_ISBN  && data != null ){
+        }
+
+        if(requestCode == CAMERA){
+
+
+            Bitmap bitmap = (Bitmap)data.getExtras().get("data");
+            photo.setImageBitmap(bitmap);
+
+            filePath = getImageUri(getApplicationContext(), bitmap);
+
+
+        }
+
+        else if(requestCode == GET_ISBN  && data != null ){
             ISBN.setText(data.getStringExtra("ISBN"));
         }
     }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+
+
+
 
 }

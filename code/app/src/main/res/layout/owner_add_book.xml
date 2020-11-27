@@ -60,10 +60,10 @@
         android:text="Confirm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.915"
+        app:layout_constraintHorizontal_bias="0.902"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/owner_add_ISBN"
-        app:layout_constraintVertical_bias="0.102" />
+        app:layout_constraintVertical_bias="0.996" />
 
     <ImageView
         android:id="@+id/photoView"
