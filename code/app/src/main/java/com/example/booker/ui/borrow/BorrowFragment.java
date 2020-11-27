@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.booker.R;
 import com.example.booker.activities.UserSignUp;
 import com.example.booker.data.OwnerListViewAdapter;
@@ -155,6 +156,7 @@ public class BorrowFragment extends Fragment {
         searchEditText = (EditText) root.findViewById(R.id.search_content);
 
         booklist = new ArrayList<Map<String, Object>>();
+
 
         //search button
 

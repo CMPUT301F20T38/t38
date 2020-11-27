@@ -10,11 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.bumptech.glide.Glide;
 import com.example.booker.R;
 import com.example.booker.ui.borrow.BorrowFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -29,7 +31,10 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +50,7 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
     private FirebaseFirestore db;
     private Map<String, Object> null_field;//in order to create a document with null field
     private String owner;
+    StorageReference storageReference;
 
     private AlertDialog.Builder builder;
 
@@ -70,6 +76,11 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
             view = LayoutInflater.from(context).inflate(R.layout.search_listview, parent, false);
         }
 
+        // imageRef = storageReference.child((String)bookList.get(i).get("ISBN")+"/");
+
+        StorageReference imageRef = FirebaseStorage.getInstance().getReference();
+
+
 
         TextView author = view.findViewById(R.id.search_book_author);
         TextView title = view.findViewById(R.id.search_book_title);
@@ -77,7 +88,12 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
         TextView ownerName = view.findViewById(R.id.search_book_owner);
         TextView status = view.findViewById(R.id.search_book_status);
 
+        ImageView image = view.findViewById(R.id.search_book_image);
 
+
+        Glide.with(view)
+                .load("https://firebasestorage.googleapis.com/v0/b/team38-5a204.appspot.com/o/uploadImage%2F222%2F1606439346049.jpg?alt=media&token=a737c89e-9c8e-43f1-baa9-7f1a859f1965")
+                .into(image);
 
         author.setText((String)bookList.get(i).get("author"));
         title.setText((String)bookList.get(i).get("title"));
@@ -198,4 +214,5 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
 
         return view;
     }
+
 }
