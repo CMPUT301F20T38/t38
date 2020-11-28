@@ -122,9 +122,8 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
                             if (documentSnapshot.exists()){
                                 ArrayList<String> uidList = (ArrayList<String>) documentSnapshot.get("requests");
-                                Log.d("Edit Request", "Loaded");
 
-                                if (uidList.size() != 0){
+                                if (uidList != null){
                                     for (int a = 0; a < uidList.size(); a++){
                                         Log.d("Loop", "Begin");
                                         CollectionReference userBorrowed = db
@@ -216,9 +215,8 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             if (documentSnapshot.exists()){
                                 ArrayList<String> uidList = (ArrayList<String>) documentSnapshot.get("requests");
-                                Log.d("Request Users", uidList.toString());
 
-                                if (uidList.size() != 0) {
+                                if (uidList != null) {
                                     for (int i = 0; i < uidList.size(); i++) {
                                         CollectionReference userBorrowed = db
                                                 .collection("User")

@@ -18,6 +18,8 @@ import com.example.booker.MainActivity;
 import com.example.booker.R;
 import com.example.booker.data.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -25,6 +27,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.Result;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 //copy
@@ -132,6 +136,28 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                                                     else{Log.d(TAG, "Change borrower status failed: ", task.getException());}
                                                 }
                                             });
+
+                                    // Update notification collection
+                                    Map<String, String> notification = new HashMap<>();
+                                    notification.put("type", "request");
+                                    notification.put("name", book);
+                                    db.collection("User").document(borrower)
+                                            .collection("Notification")
+                                            .document(book)
+                                            .set(notification)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d("Request Note", "Settle");
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d("Request Note", "Failed");
+                                                }
+                                            });
+
                                 }
                             }else{
 

@@ -251,14 +251,15 @@ public class BorrowFragment extends Fragment {
             By Yee
          */
 
-        /*
+
         if (FirebaseAuth.getInstance().getCurrentUser() != null){
             String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            CollectionReference userBorrowCollection =  db.collection("User")
+            CollectionReference userNotification =  db.collection("User")
                     .document(userID)
-                    .collection("Borrowed");
+                    .collection("Notification");
 
-            userBorrowCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            userNotification.whereEqualTo("type", "request")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                             Log.d("Book notify Listener", "Accepted");
@@ -268,7 +269,7 @@ public class BorrowFragment extends Fragment {
 
                             for (DocumentChange dc : value.getDocumentChanges()){
                                 switch (dc.getType()) {
-                                    case MODIFIED:
+                                    case ADDED:
                                         Log.d("Book notify", "Modified");
                                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                         builder.setMessage("Your book request has benn accepted")
@@ -287,10 +288,6 @@ public class BorrowFragment extends Fragment {
                         }
                     });
         }
-
-
-         */
-
 
         return root;
     }
