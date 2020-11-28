@@ -82,7 +82,7 @@ public class LendFragment extends Fragment {
         ownerAdapter = new OwnerListViewAdapter(getContext(), bookList);
         ownerList.setAdapter(ownerAdapter);
 
-        final String[] categories = {"all", "avaliable", "accepted", "requested", "borrowed"};
+        final String[] categories = {"all", "available", "accepted", "requested", "borrowed"};
         filter.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, categories));
 
         filter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -173,7 +173,7 @@ public class LendFragment extends Fragment {
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+
             }
         });
 
