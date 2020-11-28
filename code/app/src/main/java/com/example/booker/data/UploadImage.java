@@ -1,5 +1,15 @@
 package com.example.booker.data;
 
+/**
+ * Jason'part
+ * In this class, we create a uploadImage class for the purpose of uploading and getting the key for uploaded image.
+ * And this class is used in Images.activity and the ImageAdapter
+ *
+ * Modified and referenced to
+ * https://codinginflow.com/tutorials/android/firebase-storage-upload-and-retrieve-images/part-2-image-chooser
+ *
+ */
+
 public class UploadImage {
 
     private String mName;

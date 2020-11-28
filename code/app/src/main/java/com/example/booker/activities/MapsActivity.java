@@ -64,6 +64,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Jason'part
+ * In this activity, displaying a map view, and own os the book can enter a location with auto-complete by
+ * google and the map will find the location and once the user set the location as the pickup with a button
+ * click, the geo location is stored to the cloud firestore under borrower's info.
+ *
+ * Modified and referenced to
+ * https://developers.google.com/maps/documentation/android-sdk/start
+ * https://github.com/mitchtabian/Google-Maps-Google-Places/tree/6a64cdcaa35f737bf3de899e539e1cf66bdf0cde/app/src/main/java/codingwithmitch/com/googlemapsgoogleplaces
+ *
+ */
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static final String TAG = "Map Activity";

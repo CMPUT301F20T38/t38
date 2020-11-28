@@ -40,8 +40,12 @@ import java.util.List;
 import java.util.Map;
 /**
  * Jason'part
- * In this activity, it handles the part
- * This adds a city to the list if the city does not exsit
+ * In this activity, it handles the part of showing the uploaded images, and the deletion
+ *
+ * The image is loaded from the Urls stored on firestore and the actual image is store in firestorage
+ *
+ * Modified and referenced to
+ * https://codinginflow.com/tutorials/android/firebase-storage-upload-and-retrieve-images/part-8-delete-uploads
  *
  */
 
@@ -127,6 +131,8 @@ public class ImagesActivity extends AppCompatActivity  implements ImageAdapter.O
             });
 
         }
+
+
 
 
         @Override
