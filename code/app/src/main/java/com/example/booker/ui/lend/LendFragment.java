@@ -1,6 +1,7 @@
 package com.example.booker.ui.lend;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,7 +58,7 @@ import java.util.Map;
 
 public class LendFragment extends Fragment {
 
-    private ImageView btnAdd;
+    private ImageView btnAdd, btnScan;
     private Spinner filter;
     private ListView ownerList;
     private OwnerListViewAdapter ownerAdapter;
@@ -73,6 +74,7 @@ public class LendFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
         btnAdd = (ImageView) root.findViewById(R.id.owner_book_add);
+        btnScan = (ImageView) root.findViewById(R.id.owner_book_scan);
         filter = (Spinner) root.findViewById(R.id.owner_book_filter);
         ownerList = (ListView) root.findViewById(R.id.owner_book_list);
 
@@ -168,6 +170,12 @@ public class LendFragment extends Fragment {
             }
         });
 
+        btnScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                
+            }
+        });
 
         if (user != null) {
             final String userId = user.getUid();
