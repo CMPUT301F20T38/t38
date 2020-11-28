@@ -48,7 +48,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
     private Button btnEdit, btnDelete;
-    private ImageView btnPhoto, btnReturn, btnLocation, btnRequest;
+    private ImageView btnPhoto, btnReturn, btnRequest;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -78,7 +78,6 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         btnDelete = (Button) findViewById(R.id.owner_delete_btn);
         btnRequest = (ImageView) findViewById(R.id.owner_show_request);
         btnPhoto = (ImageView) findViewById(R.id.owner_add_photo);
-        btnLocation = (ImageView) findViewById(R.id.owner_map_change);
         btnReturn = (ImageView) findViewById(R.id.owner_return);
 
         editTitle.setText(title);
