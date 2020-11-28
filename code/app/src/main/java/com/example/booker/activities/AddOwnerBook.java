@@ -80,7 +80,7 @@ public class AddOwnerBook extends AppCompatActivity {
     private EditText ISBN;
     private Button btnComfirm;
 
-    private String currentPhotoPath;
+
 
     private ImageView photo;
     private ImageView addISBN;
