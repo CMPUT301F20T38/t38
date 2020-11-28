@@ -271,17 +271,21 @@ public class BorrowFragment extends Fragment {
                                 switch (dc.getType()) {
                                     case ADDED:
                                         Log.d("Book notify", "Modified");
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                        builder.setMessage("Your book request has benn accepted")
-                                                .setPositiveButton("GotCha",
-                                                        new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (getActivity() != null) {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                            builder.setMessage("Your book request has benn accepted")
+                                                    .setPositiveButton("GotCha",
+                                                            new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialogInterface, int i) {
 
-                                                    }
-                                                });
-                                        AlertDialog dialog = builder.create();
-                                        dialog.show();
+                                                                }
+                                                            });
+                                            AlertDialog dialog = builder.create();
+                                            dialog.show();
+                                        }
+                                        userNotification.document(dc.getDocument().getId())
+                                                .delete();
                                         break;
                                 }
                             }

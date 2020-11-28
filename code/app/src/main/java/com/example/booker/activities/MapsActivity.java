@@ -1,6 +1,7 @@
 package com.example.booker.activities;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -54,6 +55,7 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -62,7 +64,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Jason'part
@@ -200,6 +204,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     owner_path.update("status","accepted");
                                     owner_path.update("requests", FieldValue.arrayRemove());
 
+                                    // Update notification collection
+                                    Map<String, String> notification = new HashMap<>();
+                                    notification.put("type", "request");
+                                    db.collection("User").document(selectedBorrower)
+                                            .collection("Notification")
+                                            .document(selectedBookname)
+                                            .set(notification)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d("Request Note", "Settle");
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d("Request Note", "Failed");
+                                                }
+                                            });
+
                                     //change borrow status for accepted user
                                     db.collection("User").get()
                                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -272,20 +296,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         }
                                                     });
                                         }else{//change the borrower field in owner's book
-                                            db.collection("User").document(selectedOwner).collection("Lend")
-                                                    .document(selectedBookname).update("borrower",user_request.getUser_name())
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            db.collection("User").document(user_request.getUser_name())
+                                                    .get()
+                                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                         @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            Log.d(TAG, "Correspond user accept status successfully updated!");
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.d(TAG, "Correspond user accept status failed to updated!");
+                                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                            if (task.isSuccessful()){
+                                                                DocumentSnapshot documentSnapshot = task.getResult();
+                                                                String userName = documentSnapshot.getString("Name");
+                                                                db.collection("User").document(selectedOwner).collection("Lend")
+                                                                        .document(selectedBookname).update("borrower", userName)
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                Log.d(TAG, "Correspond user accept status successfully updated!");
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                                Log.d(TAG, "Correspond user accept status failed to updated!");
+                                                                            }
+                                                                        });
+                                                            }
                                                         }
                                                     });
+
                                         }
                                     }
 

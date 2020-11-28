@@ -136,28 +136,6 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                                                     else{Log.d(TAG, "Change borrower status failed: ", task.getException());}
                                                 }
                                             });
-
-                                    // Update notification collection
-                                    Map<String, String> notification = new HashMap<>();
-                                    notification.put("type", "request");
-                                    notification.put("name", book);
-                                    db.collection("User").document(borrower)
-                                            .collection("Notification")
-                                            .document(book)
-                                            .set(notification)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d("Request Note", "Settle");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.d("Request Note", "Failed");
-                                                }
-                                            });
-
                                 }
                             }else{
 
@@ -214,7 +192,7 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                             }
                         });
                 db.collection("User").document(owner)
-                        .collection("Lend").document(book).update("borrower", "")
+                        .collection("Lend").document(book).update("borrower", "Not Available")
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull  Task<Void> task) {
@@ -223,6 +201,25 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                                 }else{
                                     Log.d(TAG,"Failed to change the owner book borrower when accept return");
                                 }
+                            }
+                        });
+
+                Map<String, String> notification = new HashMap<>();
+                notification.put("type", "return");
+                db.collection("User").document(owner)
+                        .collection("Notification")
+                        .document(book)
+                        .set(notification)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("Return Note", "Settle");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("Return Note", "Failed");
                             }
                         });
             }

@@ -1,5 +1,7 @@
 package com.example.booker.ui.lend;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
@@ -31,6 +33,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -198,6 +201,44 @@ public class LendFragment extends Fragment {
                     Log.d("Owner Adapter", "Loaded");
                 }
             });
+
+
+            String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            CollectionReference userNotification =  db.collection("User")
+                    .document(userID)
+                    .collection("Notification");
+
+            userNotification.whereEqualTo("type", "return")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            Log.d("Book notify Listener", "Returned");
+                            if (error != null){
+                                Log.d("Return Notify", "Failed", error);
+                            }
+
+                            for (DocumentChange dc : value.getDocumentChanges()){
+                                switch (dc.getType()) {
+                                    case ADDED:
+                                        Log.d("Return notify", "Added");
+                                        if (getActivity() != null) {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                            builder.setMessage("Your book has benn returned")
+                                                    .setPositiveButton("GotCha", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface, int i) { }
+                                                    });
+                                            AlertDialog dialog = builder.create();
+                                            dialog.show();
+                                        }
+                                        userNotification.document(dc.getDocument().getId())
+                                                .delete();
+                                        break;
+                                }
+                            }
+                        }
+                    });
+
 
         }
 
