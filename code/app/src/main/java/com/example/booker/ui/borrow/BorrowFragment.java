@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.bumptech.glide.Glide;
 import com.example.booker.R;
 import com.example.booker.activities.UserSignUp;
 import com.example.booker.data.OwnerListViewAdapter;
@@ -63,7 +64,7 @@ public class BorrowFragment extends Fragment {
     private String search_content;
     private String ownerusername;
     private ArrayList<String> userids;
-    private List<Map<String, Object>> booklist;
+    private ArrayList<Map<String, Object>> booklist;
     private LatLng locaiton = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -163,13 +164,14 @@ public class BorrowFragment extends Fragment {
 
         booklist = new ArrayList<Map<String, Object>>();
 
+
         //search button
 
         Map<String, Object> finalUsermap1 = usermap;
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final List<Map<String, Object>> booklist = new ArrayList<Map<String, Object>>();
+                final ArrayList<Map<String, Object>> booklist = new ArrayList<Map<String, Object>>();
 
                 search_content = searchEditText.getText().toString();
 
@@ -219,7 +221,7 @@ public class BorrowFragment extends Fragment {
 
 
                                         if ((thisauthor.contains(search_content) || thistitle.contains(search_content) || thisISBN.contains(search_content))
-                                                && (thisstatus.equals("avaliable")  || thisstatus.equals("requested"))){
+                                                && (thisstatus.equals("available")  || thisstatus.equals("requested"))){
                                             booklist.add(map);
                                         }
 
