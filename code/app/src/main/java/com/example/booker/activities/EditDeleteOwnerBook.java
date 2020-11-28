@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,7 +48,8 @@ import java.util.ArrayList;
 public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
-    private Button btnPhoto, btnEdit, btnDelete, btnRequest;
+    private Button btnEdit, btnDelete;
+    private ImageView btnPhoto, btnReturn, btnLocation, btnRequest;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -57,6 +60,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_edit_delete_book);
 
+        final String TAG = "edit and delete book";
         final Intent intent = getIntent();
         final Book book = (Book) intent.getSerializableExtra("YeeSkywalker");
 
@@ -74,8 +78,10 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
         btnEdit = (Button) findViewById(R.id.owner_edit_btn);
         btnDelete = (Button) findViewById(R.id.owner_delete_btn);
-        btnRequest = (Button) findViewById(R.id.owner_show_request);
-        btnPhoto = (Button) findViewById(R.id.owner_add_photo);
+        btnRequest = (ImageView) findViewById(R.id.owner_show_request);
+        btnPhoto = (ImageView) findViewById(R.id.owner_add_photo);
+        btnLocation = (ImageView) findViewById(R.id.owner_map_change);
+        btnReturn = (ImageView) findViewById(R.id.owner_return);
 
         editTitle.setText(title);
         editAuthor.setText(author);
@@ -97,9 +103,6 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                 Log.d("photo: BOOK ISBN", ISBN );
 
                 startActivity(goToPhoto);
-
-
-
             }
         });
 
@@ -271,6 +274,58 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                 Intent intent_request = new Intent(view.getContext(),RequestListActivity.class);
                 intent_request.putExtra("BookName",book.getTitle());
                 startActivity(intent_request);
+            }
+        });
+
+        btnReturn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //first figure out the status of the book "only clickable when the status is borrowed"
+                db.collection("User").document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend").document(book.getTitle()).get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    //when the status is borrowed, check whether it exists in borrower's book
+                                    if(task.getResult().get("status").equals("borrowed")){
+                                        //get borrower's path
+                                        db.collection("User").document(book.getBorrower())
+                                                .collection("Borrowed").document(book.getTitle())
+                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull  Task<DocumentSnapshot> task) {
+                                                if(task.isSuccessful()){
+                                                    DocumentSnapshot document = task.getResult();
+                                                    if(document.exists()){
+                                                        //the borrower hasn't return the book yet, do nothing
+                                                        Log.d(TAG,"the borrower hasn't return the book yet");
+                                                        Toast.makeText(getApplicationContext(),"Borrower hasn't return the book yet, please check later", Toast.LENGTH_SHORT);
+
+                                                    }
+                                                    else{
+                                                        //the borrower has returned the book , scan to change status
+                                                        Log.d(TAG,"the borrower has return the book yet");
+                                                        Intent intent = new Intent(getApplicationContext(), ScanCodeActivity.class);
+                                                        //set the path to the user's book, also delete borrower's document
+                                                        intent.putExtra("event","confirm_returned_book");
+                                                        intent.putExtra("book",book.getTitle());
+                                                        intent.putExtra("owner",book.getOwner());
+                                                        intent.putExtra("isbn",book.getISBN());
+                                                        startActivity(intent);
+                                                    }
+                                                }else{
+                                                    Log.d(TAG,"failed to find the path of document for return btn");
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                }else{
+                                    Log.d(TAG,"cannot find the owner path");
+                                }
+                            }
+                        });
             }
         });
 

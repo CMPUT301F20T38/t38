@@ -10,32 +10,65 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:weightSum="2"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/owner_book_add"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Add Book" />
+            android:text="As an owner!"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:gravity="start"
+            android:typeface="serif"
+            android:paddingLeft="20dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:paddingRight="20dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/owner_book_add"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_owner_add_book"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
 
         <Spinner
+            android:gravity="center"
             android:id="@+id/owner_book_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"/>
+            android:textAlignment="center"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:background="@drawable/spinner_background"
+            android:popupBackground="@drawable/spinner_background" />
 
     </LinearLayout>
+
 
     <ListView
         android:id="@+id/owner_book_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:divider="@null"/>
 
 </LinearLayout>

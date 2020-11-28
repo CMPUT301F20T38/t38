@@ -42,31 +42,28 @@
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/edit_text_border"
         android:hint="@string/book_ISBN"
         android:imeOptions="actionDone"
         android:selectAllOnFocus="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/photoView" />
+        app:layout_constraintTop_toBottomOf="@+id/add_progress_bar" />
 
     <Button
         android:id="@+id/owner_add_confirm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="114dp"
+        android:layout_height="44dp"
         android:layout_gravity="start"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="48dp"
         android:layout_marginBottom="96dp"
 
         android:text="Confirm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.902"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/owner_add_ISBN"
-        app:layout_constraintVertical_bias="0.524" />
+        app:layout_constraintVertical_bias="0.996" />
 
     <ImageView
         android:id="@+id/photoView"
@@ -75,6 +72,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/edit_text_border"
         android:src="@drawable/ic_baseline_add_a_photo_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -83,7 +81,6 @@
         android:id="@+id/add_isbn_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/edit_text_border"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
         android:layout_marginTop="16dp"
