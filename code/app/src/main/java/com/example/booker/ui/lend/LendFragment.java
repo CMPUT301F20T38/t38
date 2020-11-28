@@ -1,6 +1,9 @@
 package com.example.booker.ui.lend;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +33,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -57,7 +61,7 @@ import java.util.Map;
 
 public class LendFragment extends Fragment {
 
-    private ImageView btnAdd;
+    private ImageView btnAdd, btnScan;
     private Spinner filter;
     private ListView ownerList;
     private OwnerListViewAdapter ownerAdapter;
@@ -73,6 +77,7 @@ public class LendFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
         btnAdd = (ImageView) root.findViewById(R.id.owner_book_add);
+        btnScan = (ImageView) root.findViewById(R.id.owner_book_scan);
         filter = (Spinner) root.findViewById(R.id.owner_book_filter);
         ownerList = (ListView) root.findViewById(R.id.owner_book_list);
 
@@ -80,7 +85,7 @@ public class LendFragment extends Fragment {
         ownerAdapter = new OwnerListViewAdapter(getContext(), bookList);
         ownerList.setAdapter(ownerAdapter);
 
-        final String[] categories = {"all", "avaliable", "accepted", "requested", "borrowed"};
+        final String[] categories = {"all", "available", "accepted", "requested", "borrowed"};
         filter.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, categories));
 
         filter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -168,6 +173,12 @@ public class LendFragment extends Fragment {
             }
         });
 
+        btnScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         if (user != null) {
             final String userId = user.getUid();
@@ -190,6 +201,44 @@ public class LendFragment extends Fragment {
                     Log.d("Owner Adapter", "Loaded");
                 }
             });
+
+
+            String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            CollectionReference userNotification =  db.collection("User")
+                    .document(userID)
+                    .collection("Notification");
+
+            userNotification.whereEqualTo("type", "return")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            Log.d("Book notify Listener", "Returned");
+                            if (error != null){
+                                Log.d("Return Notify", "Failed", error);
+                            }
+
+                            for (DocumentChange dc : value.getDocumentChanges()){
+                                switch (dc.getType()) {
+                                    case ADDED:
+                                        Log.d("Return notify", "Added");
+                                        if (getActivity() != null) {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                            builder.setMessage("Your book has benn returned")
+                                                    .setPositiveButton("GotCha", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface, int i) { }
+                                                    });
+                                            AlertDialog dialog = builder.create();
+                                            dialog.show();
+                                        }
+                                        userNotification.document(dc.getDocument().getId())
+                                                .delete();
+                                        break;
+                                }
+                            }
+                        }
+                    });
+
 
         }
 

@@ -16,15 +16,15 @@
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:text="Album"
-            android:background="#ffff"
+            android:background="#f0f8ff"
             android:textSize="18sp" />
 
         <Button
             android:id="@+id/btn_pop_camera"
             android:layout_width="match_parent"
             android:layout_height="45dp"
+            android:background="#f0f8ff"
             android:text="Camera"
-            android:background="#ffff"
             android:textSize="18sp" />
 
         <Button
@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_marginTop="10dp"
-            android:background="#ffff"
+            android:background="#f0f8ff"
             android:text="Cancel"
             android:textSize="18sp" />
     </LinearLayout>

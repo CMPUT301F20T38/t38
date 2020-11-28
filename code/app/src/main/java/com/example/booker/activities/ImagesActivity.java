@@ -38,7 +38,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Jason'part
+ * In this activity, it handles the part of showing the uploaded images, and the deletion
+ *
+ * The image is loaded from the Urls stored on firestore and the actual image is store in firestorage
+ *
+ * Modified and referenced to
+ * https://codinginflow.com/tutorials/android/firebase-storage-upload-and-retrieve-images/part-8-delete-uploads
+ *
+ */
 
 public class ImagesActivity extends AppCompatActivity  implements ImageAdapter.OnItemClickListener{ //
         private RecyclerView mRecyclerView;
@@ -120,55 +129,10 @@ public class ImagesActivity extends AppCompatActivity  implements ImageAdapter.O
                     }
                 }
             });
-//
-//                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                mUploads.clear();
-//                                for (QueryDocumentSnapshot document : task.getResult()) {
-//
-//                                    Map<String, Object> myMap = (Map<String, Object>) document.getData();
-//                                    String name = (String) myMap.get("Name");
-//                                    String myUrll = (String) myMap.get("Url");
-//
-//                                    UploadImage upload = new UploadImage(name,myUrll);
-//                                    upload.setmKey(document.getId());
-//
-//                                    Log.d(TAG, document.getId() + " => " + document.getData());
-//
-//                                    mUploads.add(upload);
-//                                }
-//                                mAdapter.notifyDataSetChanged();
-//                                mProgressCircle.setVisibility(View.INVISIBLE);
-//                            } else {
-//                                Log.d(TAG, "Error getting documents: ", task.getException());
-//                                Toast.makeText(ImagesActivity.this, "Error getting documents: ", Toast.LENGTH_SHORT).show();
-//                                mProgressCircle.setVisibility(View.INVISIBLE);
-//                            }
-//                        }
-//                    });
 
-//            mDatabaseRef = FirebaseDatabase.getInstance().getReference("uploadImage").child(bookISBN);
-//            mDBListener = mDatabaseRef.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    mUploads.clear();
-//                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                        UploadImage upload = postSnapshot.getValue(UploadImage.class);
-//                        upload.setmKey(postSnapshot.getKey());
-//                        mUploads.add(upload);
-//                    }
-//                    mAdapter.notifyDataSetChanged();
-//                    mProgressCircle.setVisibility(View.INVISIBLE);
-//                }
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//                    Toast.makeText(ImagesActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-//                    mProgressCircle.setVisibility(View.INVISIBLE);
-//                }
-//            });
         }
+
+
 
 
         @Override

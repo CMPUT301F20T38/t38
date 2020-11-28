@@ -26,6 +26,18 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Jason'part
+ * In this activity, displaying the pick-up location in a a map view, and user can jump to google map for direction
+ * to the location.
+ *
+ * the geo location is retrieved from the cloud firestore under borrow.
+ *
+ * Modified and referenced to
+ * https://developers.google.com/maps/documentation/android-sdk/start
+ *
+ */
+
 public class DisplayMapActivity extends FragmentActivity implements OnMapReadyCallback {
 
 

@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,7 +49,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
     private Button btnEdit, btnDelete;
-    private ImageView btnPhoto, btnReturn, btnLocation, btnRequest;
+    private ImageView btnPhoto, btnReturn, btnRequest;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -59,6 +60,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_edit_delete_book);
 
+        final String TAG = "edit and delete book";
         final Intent intent = getIntent();
         final Book book = (Book) intent.getSerializableExtra("YeeSkywalker");
 
@@ -78,7 +80,6 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         btnDelete = (Button) findViewById(R.id.owner_delete_btn);
         btnRequest = (ImageView) findViewById(R.id.owner_show_request);
         btnPhoto = (ImageView) findViewById(R.id.owner_add_photo);
-        btnLocation = (ImageView) findViewById(R.id.owner_map_change);
         btnReturn = (ImageView) findViewById(R.id.owner_return);
 
         editTitle.setText(title);
@@ -121,9 +122,8 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
                             if (documentSnapshot.exists()){
                                 ArrayList<String> uidList = (ArrayList<String>) documentSnapshot.get("requests");
-                                Log.d("Edit Request", "Loaded");
 
-                                if (uidList.size() != 0){
+                                if (uidList != null){
                                     for (int a = 0; a < uidList.size(); a++){
                                         Log.d("Loop", "Begin");
                                         CollectionReference userBorrowed = db
@@ -215,9 +215,8 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             if (documentSnapshot.exists()){
                                 ArrayList<String> uidList = (ArrayList<String>) documentSnapshot.get("requests");
-                                Log.d("Request Users", uidList.toString());
 
-                                if (uidList.size() != 0) {
+                                if (uidList != null) {
                                     for (int i = 0; i < uidList.size(); i++) {
                                         CollectionReference userBorrowed = db
                                                 .collection("User")
@@ -272,6 +271,58 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                 Intent intent_request = new Intent(view.getContext(),RequestListActivity.class);
                 intent_request.putExtra("BookName",book.getTitle());
                 startActivity(intent_request);
+            }
+        });
+
+        btnReturn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //first figure out the status of the book "only clickable when the status is borrowed"
+                db.collection("User").document(mAuth.getCurrentUser().getUid())
+                        .collection("Lend").document(book.getTitle()).get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    //when the status is borrowed, check whether it exists in borrower's book
+                                    if(task.getResult().get("status").equals("borrowed")){
+                                        //get borrower's path
+                                        db.collection("User").document(book.getBorrower())
+                                                .collection("Borrowed").document(book.getTitle())
+                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull  Task<DocumentSnapshot> task) {
+                                                if(task.isSuccessful()){
+                                                    DocumentSnapshot document = task.getResult();
+                                                    if(document.exists()){
+                                                        //the borrower hasn't return the book yet, do nothing
+                                                        Log.d(TAG,"the borrower hasn't return the book yet");
+                                                        Toast.makeText(getApplicationContext(),"Borrower hasn't return the book yet, please check later", Toast.LENGTH_SHORT);
+
+                                                    }
+                                                    else{
+                                                        //the borrower has returned the book , scan to change status
+                                                        Log.d(TAG,"the borrower has return the book yet");
+                                                        Intent intent = new Intent(getApplicationContext(), ScanCodeActivity.class);
+                                                        //set the path to the user's book, also delete borrower's document
+                                                        intent.putExtra("event","confirm_returned_book");
+                                                        intent.putExtra("book",book.getTitle());
+                                                        intent.putExtra("owner",book.getOwner());
+                                                        intent.putExtra("isbn",book.getISBN());
+                                                        startActivity(intent);
+                                                    }
+                                                }else{
+                                                    Log.d(TAG,"failed to find the path of document for return btn");
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                }else{
+                                    Log.d(TAG,"cannot find the owner path");
+                                }
+                            }
+                        });
             }
         });
 

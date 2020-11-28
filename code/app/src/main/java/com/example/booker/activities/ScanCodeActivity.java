@@ -18,6 +18,8 @@ import com.example.booker.MainActivity;
 import com.example.booker.R;
 import com.example.booker.data.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -25,6 +27,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.Result;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 //copy
@@ -141,6 +145,85 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                         }
                     });
 
+        }else if(event.equals("return_book")){
+            //borrower side return the book
+            //get data from intent
+            String owner  = prev_intent.getStringExtra("owner");
+            String borrower  = prev_intent.getStringExtra("borrower");
+            String book  = prev_intent.getStringExtra("book");
+            String isbn = prev_intent.getStringExtra("isbn");
+            //Log.e("================================================",owner+borrower+book);
+            //firebase path
+            if(result.getText().equals(isbn)){
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("User").document(borrower)
+                        .collection("Borrowed").document(book).delete()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull  Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.d(TAG, "Successfully returned book and delete document");
+                                }else{
+                                    Log.d(TAG, "Return book failed and not delete document: ", task.getException());
+                                }
+                            }
+                        });
+            }
+            finish();
+
+        }else if(event.equals("confirm_returned_book")){
+            //owner side accept returned book
+            //change the book status and borrower
+            String owner  = prev_intent.getStringExtra("owner");
+            String book  = prev_intent.getStringExtra("book");
+            String isbn = prev_intent.getStringExtra("isbn");
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            if(result.getText().equals(isbn)) {
+                db.collection("User").document(owner)
+                        .collection("Lend").document(book).update("status", "available")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull  Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.d(TAG,"Successfully changed the owner book status when accept return");
+                                }else{
+                                    Log.d(TAG,"Failed to change the owner book status when accept return");
+                                }
+                            }
+                        });
+                db.collection("User").document(owner)
+                        .collection("Lend").document(book).update("borrower", "Not Available")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull  Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.d(TAG,"Successfully changed the owner book borrower when accept return");
+                                }else{
+                                    Log.d(TAG,"Failed to change the owner book borrower when accept return");
+                                }
+                            }
+                        });
+
+                Map<String, String> notification = new HashMap<>();
+                notification.put("type", "return");
+                db.collection("User").document(owner)
+                        .collection("Notification")
+                        .document(book)
+                        .set(notification)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("Return Note", "Settle");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("Return Note", "Failed");
+                            }
+                        });
+            }
+            finish();
         }
 
         //onBackPressed();
