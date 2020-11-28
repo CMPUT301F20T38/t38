@@ -25,6 +25,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -51,6 +53,7 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
     private Map<String, Object> null_field;//in order to create a document with null field
     private String owner;
     StorageReference storageReference;
+    private DatabaseReference mDatabaseRef;
 
     private AlertDialog.Builder builder;
 
@@ -76,9 +79,15 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
             view = LayoutInflater.from(context).inflate(R.layout.search_listview, parent, false);
         }
 
-        // imageRef = storageReference.child((String)bookList.get(i).get("ISBN")+"/");
+        db = FirebaseFirestore.getInstance();
 
-        StorageReference imageRef = FirebaseStorage.getInstance().getReference();
+        // imageRef = storageReference.child((String)bookList.get(i).get("ISBN")+"/");
+        storageReference = FirebaseStorage.getInstance().getReference("uploadImage");
+
+        mDatabaseRef= FirebaseDatabase.getInstance().getReference("uploadImage");
+
+        StorageReference imageRef = storageReference.child("1/1606439309622.jpg");
+        //StorageReference imageRef = FirebaseStorage.getInstance().getReference();
 
 
 
@@ -130,7 +139,7 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
         });
 
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+
 
         request_button = view.findViewById(R.id.search_request_button);
         final int where = i;

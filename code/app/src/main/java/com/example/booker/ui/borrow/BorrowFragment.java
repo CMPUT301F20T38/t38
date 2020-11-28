@@ -214,7 +214,7 @@ public class BorrowFragment extends Fragment {
 
 
                                         if ((thisauthor.contains(search_content) || thistitle.contains(search_content) || thisISBN.contains(search_content))
-                                                && (thisstatus.equals("avaliable")  || thisstatus.equals("requested"))){
+                                                && (thisstatus.equals("available")  || thisstatus.equals("requested"))){
                                             booklist.add(map);
                                         }
 
