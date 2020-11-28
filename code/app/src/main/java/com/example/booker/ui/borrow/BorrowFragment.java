@@ -1,5 +1,8 @@
 package com.example.booker.ui.borrow;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.booker.R;
 import com.example.booker.activities.UserSignUp;
@@ -27,8 +31,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -238,6 +245,51 @@ public class BorrowFragment extends Fragment {
             }
 
         });
+
+        /*
+            Request Approve Notification
+            By Yee
+         */
+
+        /*
+        if (FirebaseAuth.getInstance().getCurrentUser() != null){
+            String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            CollectionReference userBorrowCollection =  db.collection("User")
+                    .document(userID)
+                    .collection("Borrowed");
+
+            userBorrowCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            Log.d("Book notify Listener", "Accepted");
+                            if (error != null){
+                                Log.d("Accept Notify", "Failed", error);
+                            }
+
+                            for (DocumentChange dc : value.getDocumentChanges()){
+                                switch (dc.getType()) {
+                                    case MODIFIED:
+                                        Log.d("Book notify", "Modified");
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                        builder.setMessage("Your book request has benn accepted")
+                                                .setPositiveButton("GotCha",
+                                                        new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                    }
+                                                });
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                        break;
+                                }
+                            }
+                        }
+                    });
+        }
+
+
+         */
 
 
         return root;

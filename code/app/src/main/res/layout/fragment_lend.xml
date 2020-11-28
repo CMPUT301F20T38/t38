@@ -34,6 +34,16 @@
             android:layout_weight="1">
 
             <ImageView
+                android:id="@+id/owner_book_scan"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_owner_scan_code"/>
+
+            <View
+                android:layout_width="13dp"
+                android:layout_height="26dp"/>
+
+            <ImageView
                 android:id="@+id/owner_book_add"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
