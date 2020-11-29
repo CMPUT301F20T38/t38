@@ -60,16 +60,6 @@
                 android:layout_height="26dp"
                 android:src="@drawable/ic_owner_return"/>
 
-            <View
-                android:layout_width="13dp"
-                android:layout_height="26dp"/>
-
-            <ImageView
-                android:id="@+id/owner_map_change"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:src="@drawable/ic_owner_map"/>
-
         </LinearLayout>
     </LinearLayout>
     <LinearLayout

@@ -49,7 +49,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
     private EditText editTitle, editAuthor, editISBN;
     private Button btnEdit, btnDelete;
-    private ImageView btnPhoto, btnReturn, btnLocation, btnRequest;
+    private ImageView btnPhoto, btnReturn, btnRequest;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -80,7 +80,6 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         btnDelete = (Button) findViewById(R.id.owner_delete_btn);
         btnRequest = (ImageView) findViewById(R.id.owner_show_request);
         btnPhoto = (ImageView) findViewById(R.id.owner_add_photo);
-        btnLocation = (ImageView) findViewById(R.id.owner_map_change);
         btnReturn = (ImageView) findViewById(R.id.owner_return);
 
         editTitle.setText(title);
@@ -123,9 +122,8 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
 
                             if (documentSnapshot.exists()){
                                 ArrayList<String> uidList = (ArrayList<String>) documentSnapshot.get("requests");
-                                Log.d("Edit Request", "Loaded");
 
-                                if (uidList.size() != 0){
+                                if (uidList != null){
                                     for (int a = 0; a < uidList.size(); a++){
                                         Log.d("Loop", "Begin");
                                         CollectionReference userBorrowed = db
@@ -217,9 +215,8 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
                             DocumentSnapshot documentSnapshot = task.getResult();
                             if (documentSnapshot.exists()){
                                 ArrayList<String> uidList = (ArrayList<String>) documentSnapshot.get("requests");
-                                Log.d("Request Users", uidList.toString());
 
-                                if (uidList.size() != 0) {
+                                if (uidList != null) {
                                     for (int i = 0; i < uidList.size(); i++) {
                                         CollectionReference userBorrowed = db
                                                 .collection("User")
@@ -330,6 +327,7 @@ public class EditDeleteOwnerBook extends AppCompatActivity {
         });
 
     }
+
 
     // TextWatcher that ensures user have input all needed information brefore submit
     TextWatcher textWatcher = new TextWatcher() {

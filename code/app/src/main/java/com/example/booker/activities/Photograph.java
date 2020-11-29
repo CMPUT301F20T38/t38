@@ -52,6 +52,18 @@ import java.util.UUID;
 
 import static com.google.common.io.Files.getFileExtension;
 
+/**
+ * Jason'part
+ * In this activity, owner can add photograph of book from their gallery or google drive. Once the upload button
+ * is clicked, the picture is store in FireStorage and the corresponded the url and name of the picture is stored in
+ * cloud Firebase with a nested field.
+ *
+ * Modified and referenced to
+ * https://codinginflow.com/tutorials/android/firebase-storage-upload-and-retrieve-images/part-2-image-chooser
+ *
+ */
+
+
 public class Photograph extends AppCompatActivity {
 
     // views for button

@@ -288,6 +288,7 @@ public class AddOwnerBook extends AppCompatActivity {
                                     + System.currentTimeMillis()
                                     + "." + getFileExtension(filePath));
 
+
             // adding listeners on upload
             // or failure of image
             mUploadTask=imageRef.putFile(filePath)
@@ -492,7 +493,11 @@ public class AddOwnerBook extends AppCompatActivity {
 
             // Get the Uri of data
             filePath = data.getData();
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> main
             try {
 
                 // Setting image on image view using Bitmap
