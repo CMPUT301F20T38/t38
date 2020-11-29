@@ -178,9 +178,11 @@ public class LendFragment extends Fragment {
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Intent intent_request = new Intent(view.getContext(), ScanCodeActivity.class);
                 intent_request.putExtra("event","scan_for_desc");
                 startActivity(intent_request);
+
             }
         });
 

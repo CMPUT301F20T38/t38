@@ -232,6 +232,7 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                         });
             }
             finish();
+
         }else if(event.equals("scan_for_desc")){
             String isbn = result.getText();
             //boolean flag = false;//check whether find the book or not
