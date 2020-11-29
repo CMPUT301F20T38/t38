@@ -493,11 +493,7 @@ public class AddOwnerBook extends AppCompatActivity {
 
             // Get the Uri of data
             filePath = data.getData();
-<<<<<<< HEAD
 
-=======
-            
->>>>>>> main
             try {
 
                 // Setting image on image view using Bitmap
