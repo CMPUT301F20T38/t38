@@ -81,16 +81,6 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
 
         db = FirebaseFirestore.getInstance();
 
-        // imageRef = storageReference.child((String)bookList.get(i).get("ISBN")+"/");
-        storageReference = FirebaseStorage.getInstance().getReference("uploadImage");
-
-        mDatabaseRef= FirebaseDatabase.getInstance().getReference("uploadImage");
-
-        StorageReference imageRef = storageReference.child("1/1606439309622.jpg");
-        //StorageReference imageRef = FirebaseStorage.getInstance().getReference();
-
-
-
         TextView author = view.findViewById(R.id.search_book_author);
         TextView title = view.findViewById(R.id.search_book_title);
         TextView ISBN = view.findViewById(R.id.search_book_ISBN);
@@ -99,10 +89,56 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
 
         ImageView image = view.findViewById(R.id.search_book_image);
 
+        // imageRef = storageReference.child((String)bookList.get(i).get("ISBN")+"/");
+        View finalView = view;
 
+        db.collection("UploadImages").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    Log.e("image","begin");
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        //Log.e("imageID",document.getId());
+                       if (document.getId().equals((String)bookList.get(i).get("ISBN"))) {
+
+                           Log.e("image",(String)bookList.get(i).get("ISBN"));
+                           //Log.e("image",document.getData().);
+
+                           Map<String, Object> map = new HashMap<String, Object>();
+                           map = (Map) document.getData();
+                           for(String i: map.keySet()){
+                               Map<String, Object> map1 = new HashMap<String, Object>();
+                               map1 = (Map) map.get(i);
+
+                               Log.e("imagefind",map1.get("Url").toString());
+
+
+                               Glide.with(finalView)
+                                       .load(map1.get("Url").toString())
+                                       .into(image);
+                           }
+                        }
+                    }
+                }
+
+            }
+        });
+
+        storageReference = FirebaseStorage.getInstance().getReference("uploadImage");
+
+        mDatabaseRef= FirebaseDatabase.getInstance().getReference("uploadImage");
+
+        StorageReference imageRef = storageReference.child("1/1606439309622.jpg");
+        //StorageReference imageRef = FirebaseStorage.getInstance().getReference();
+
+
+        /*
         Glide.with(view)
                 .load("https://firebasestorage.googleapis.com/v0/b/team38-5a204.appspot.com/o/uploadImage%2F222%2F1606439346049.jpg?alt=media&token=a737c89e-9c8e-43f1-baa9-7f1a859f1965")
                 .into(image);
+
+
+         */
 
         author.setText((String)bookList.get(i).get("author"));
         title.setText((String)bookList.get(i).get("title"));

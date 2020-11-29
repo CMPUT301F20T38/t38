@@ -117,6 +117,7 @@ public class AddOwnerBook extends AppCompatActivity {
         photo = findViewById(R.id.photoView);
         addISBN = findViewById(R.id.add_isbn_button);
 
+
         mEditTextFileName = findViewById(R.id.owner_add_title);
         mProgressBar = findViewById(R.id.add_progress_bar);
 
@@ -286,6 +287,7 @@ public class AddOwnerBook extends AppCompatActivity {
                             bookISBN+"/"
                                     + System.currentTimeMillis()
                                     + "." + getFileExtension(filePath));
+
 
             // adding listeners on upload
             // or failure of image
