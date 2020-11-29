@@ -120,144 +120,7 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
 
                                 }
                             });
-                            //set the button change and visibility of map
-                            if(borrowedBook.getStatus().equals("borrowed")){//borrowed
-                                accept_book.setVisibility(View.GONE);
-                                return_book.setVisibility(View.VISIBLE);
-                                cancel_book.setVisibility(View.GONE);
-                                map_img.setVisibility(View.INVISIBLE);
 
-                                //set the click listener on return button
-                                return_book.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                        db.collection("User")
-                                                .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
-                                                .document(borrowedBook.getTitle())
-                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull  Task<DocumentSnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    Intent intent = new Intent(context.getApplicationContext(), ScanCodeActivity.class);
-                                                    //set the path to the user's book, also delete borrower's document
-                                                    intent.putExtra("event","return_book");
-                                                    intent.putExtra("book",borrowedBook.getTitle());
-                                                    intent.putExtra("owner",borrowedBook.getOwner());
-                                                    intent.putExtra("borrower",mAuth.getCurrentUser().getUid());
-                                                    intent.putExtra("isbn",borrowedBook.getISBN());
-                                                    context.startActivity(intent);
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                            }else if (borrowedBook.getStatus().equals("accepted")){//accepted
-                                accept_book.setVisibility(View.VISIBLE);
-                                return_book.setVisibility(View.GONE);
-                                cancel_book.setVisibility(View.GONE);
-                                map_img.setVisibility(View.VISIBLE);
-
-
-                                //for Map
-                                map_img.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-
-                                    public void onClick(View view) {
-                                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                        db.collection("User")
-                                                .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
-                                                .document(borrowedBook.getTitle())
-                                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    // Document found in the offline cache
-                                                    DocumentSnapshot document = task.getResult();
-
-                                                    Map data = (Map) document.get("location");
-
-                                                    Double lat = (Double) data.get("latitude");
-                                                    Double lon = (Double) data.get("longitude");
-
-                                                    Log.d(TAG, "Cached document data lat: " + lat);
-                                                    Log.d(TAG, "Cached document data lon : " + lon);
-
-                                                    Intent goToDisplayMap = new Intent(context, DisplayMapActivity.class);
-                                                    goToDisplayMap.putExtra("LAT", lat);
-                                                    Log.d(TAG, "putExtra: Lattt:  "+lat);
-
-                                                    goToDisplayMap.putExtra("LON", lon);
-                                                    Log.d(TAG, "putExtra: LONGG:"+lon);
-
-                                                    context.startActivity(goToDisplayMap);
-
-
-
-                                                } else {
-                                                    Log.d(TAG, "Cached get failed: ", task.getException());
-                                                }
-                                            }
-                                        });
-
-                                    }
-                                });
-
-
-                                //end of map interaction
-                                //for ISBN, scan to confirm borrow the book and set status to borrowed
-                                accept_book.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                        Intent intent = new Intent(context.getApplicationContext(), ScanCodeActivity.class);
-                                        //set the path to the user's book
-                                        intent.putExtra("event","accept_book");
-                                        intent.putExtra("book",borrowedBook.getTitle());
-                                        intent.putExtra("owner",borrowedBook.getOwner());
-                                        intent.putExtra("borrower",mAuth.getCurrentUser().getUid());
-                                        context.startActivity(intent);
-                                    }
-                                });
-
-
-                            }else{//requested, but not accept
-                                accept_book.setVisibility(View.GONE);
-                                return_book.setVisibility(View.GONE);
-                                cancel_book.setVisibility(View.VISIBLE);
-                                map_img.setVisibility(View.GONE);
-                                cancel_book.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {//cancel the book that requested
-                                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                        //delete it in borrower's list
-                                        db.collection("User")
-                                                .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
-                                                .document(borrowedBook.getTitle()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull  Task<Void> task) {
-                                                if(task.isSuccessful()){Log.d(TAG,"delete request in borrower's list");}
-                                                else{Log.d(TAG,"Fail to delete request in borrower's list");}
-                                            }
-                                        });
-
-                                        //delete the borrower in owner's list
-                                        db.collection("User")
-                                                .document(borrowedBook.getOwner()).collection("Lend")
-                                                .document(borrowedBook.getTitle()).update("requests", FieldValue.arrayRemove(mAuth.getCurrentUser().getUid()))
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if(task.isSuccessful()){Log.d(TAG,"Delete borrower in owner's list");}
-                                                        else{Log.d(TAG,"Fail to delete borrower in owner's list");}
-                                                    }
-                                                });
-                                    }
-                                });
-                            }
                         }else{
                             Log.d(TAG,"Fail to find document");
                         }
@@ -265,7 +128,144 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
                     }
                 });
 
+        //set the button change and visibility of map
+        if(borrowedBook.getStatus().equals("borrowed")){//borrowed
+            accept_book.setVisibility(View.GONE);
+            return_book.setVisibility(View.VISIBLE);
+            cancel_book.setVisibility(View.GONE);
+            map_img.setVisibility(View.INVISIBLE);
 
+            //set the click listener on return button
+            return_book.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("User")
+                            .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
+                            .document(borrowedBook.getTitle())
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull  Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                Intent intent = new Intent(context.getApplicationContext(), ScanCodeActivity.class);
+                                //set the path to the user's book, also delete borrower's document
+                                intent.putExtra("event","return_book");
+                                intent.putExtra("book",borrowedBook.getTitle());
+                                intent.putExtra("owner",borrowedBook.getOwner());
+                                intent.putExtra("borrower",mAuth.getCurrentUser().getUid());
+                                intent.putExtra("isbn",borrowedBook.getISBN());
+                                context.startActivity(intent);
+                            }
+                        }
+                    });
+                }
+            });
+        }else if (borrowedBook.getStatus().equals("accepted")){//accepted
+            accept_book.setVisibility(View.VISIBLE);
+            return_book.setVisibility(View.GONE);
+            cancel_book.setVisibility(View.GONE);
+            map_img.setVisibility(View.VISIBLE);
+
+
+            //for Map
+            map_img.setOnClickListener(new View.OnClickListener() {
+                @Override
+
+                public void onClick(View view) {
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("User")
+                            .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
+                            .document(borrowedBook.getTitle())
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                // Document found in the offline cache
+                                DocumentSnapshot document = task.getResult();
+
+                                Map data = (Map) document.get("location");
+
+                                Double lat = (Double) data.get("latitude");
+                                Double lon = (Double) data.get("longitude");
+
+                                Log.d(TAG, "Cached document data lat: " + lat);
+                                Log.d(TAG, "Cached document data lon : " + lon);
+
+                                Intent goToDisplayMap = new Intent(context, DisplayMapActivity.class);
+                                goToDisplayMap.putExtra("LAT", lat);
+                                Log.d(TAG, "putExtra: Lattt:  "+lat);
+
+                                goToDisplayMap.putExtra("LON", lon);
+                                Log.d(TAG, "putExtra: LONGG:"+lon);
+
+                                context.startActivity(goToDisplayMap);
+
+
+
+                            } else {
+                                Log.d(TAG, "Cached get failed: ", task.getException());
+                            }
+                        }
+                    });
+
+                }
+            });
+
+
+            //end of map interaction
+            //for ISBN, scan to confirm borrow the book and set status to borrowed
+            accept_book.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    Intent intent = new Intent(context.getApplicationContext(), ScanCodeActivity.class);
+                    //set the path to the user's book
+                    intent.putExtra("event","accept_book");
+                    intent.putExtra("book",borrowedBook.getTitle());
+                    intent.putExtra("owner",borrowedBook.getOwner());
+                    intent.putExtra("borrower",mAuth.getCurrentUser().getUid());
+                    context.startActivity(intent);
+                }
+            });
+
+
+        }else{//requested, but not accept
+            accept_book.setVisibility(View.GONE);
+            return_book.setVisibility(View.GONE);
+            cancel_book.setVisibility(View.VISIBLE);
+            map_img.setVisibility(View.GONE);
+            cancel_book.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {//cancel the book that requested
+                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    //delete it in borrower's list
+                    db.collection("User")
+                            .document(mAuth.getCurrentUser().getUid()).collection("Borrowed")
+                            .document(borrowedBook.getTitle()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull  Task<Void> task) {
+                            if(task.isSuccessful()){Log.d(TAG,"delete request in borrower's list");}
+                            else{Log.d(TAG,"Fail to delete request in borrower's list");}
+                        }
+                    });
+
+                    //delete the borrower in owner's list
+                    db.collection("User")
+                            .document(borrowedBook.getOwner()).collection("Lend")
+                            .document(borrowedBook.getTitle()).update("requests", FieldValue.arrayRemove(mAuth.getCurrentUser().getUid()))
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){Log.d(TAG,"Delete borrower in owner's list");}
+                                    else{Log.d(TAG,"Fail to delete borrower in owner's list");}
+                                }
+                            });
+                }
+            });
+        }
 
 
         return view;

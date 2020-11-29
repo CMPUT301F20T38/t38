@@ -7,15 +7,19 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.booker.MainActivity;
 import com.example.booker.R;
+import com.example.booker.data.Book;
 import com.example.booker.data.Request;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,6 +28,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.zxing.Result;
 
 import java.util.ArrayList;
@@ -35,10 +41,12 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 
 public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler{
+    boolean flag_a = false;
     int MY_PERMISSIONS_REQUEST_CAMERA=0;
     ZXingScannerView scannerView;
     private final String TAG="Scanner";
     private FirebaseAuth mAuth;
+    private AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,6 +232,92 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                         });
             }
             finish();
+        }else if(event.equals("scan_for_desc")){
+            String isbn = result.getText();
+            //boolean flag = false;//check whether find the book or not
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            //check through all lend books and find the matched isbn
+            db.collection("User").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull  Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        //find the owner uid, thus use it for mauth.email
+                        //loop usernames
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            //get all the books of the user
+                            db.collection("User").document(document.getId()).collection("Lend")
+                                    .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                    if (task.isSuccessful()) {
+                                        //find the owner uid, thus use it for mauth.email
+                                        //loop booknames
+
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            //find the correspond book
+
+                                            //Log.e("======================================",document.get("isbn").toString()+"   "+isbn);
+                                            flag_a = true;
+                                            if(document.get("isbn").toString().equals(isbn)){
+                                                //Log.e("======================================","find the book");
+
+                                                String status = document.get("status").toString();
+                                                String borrower = document.get("borrower").toString();
+                                                String title = document.get("title").toString();
+                                                String author = document.get("author").toString();
+                                                builder = new AlertDialog.Builder(scannerView.getContext());
+                                                builder.setMessage("Title: "+title+"\nAuthor: "+author+"\nBorrower: "+borrower+"\nStatus: "+status)
+                                                        .setCancelable(false)
+                                                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                                            public void onClick(DialogInterface dialog, int id) {
+                                                                finish();
+                                                                Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
+                                                                        Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        })  ;
+                                                AlertDialog dialog = builder.create();
+                                                dialog.show();
+                                                return;
+                                            }
+                                        }
+
+                                        if(!flag_a){
+                                            //Log.e("======================================","not find the book");
+                                            builder = new AlertDialog.Builder(scannerView.getContext());
+                                            builder.setMessage("No book match the ISBN")
+                                                    .setCancelable(false)
+                                                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int id) {
+                                                            finish();
+                                                        }
+                                                    })  ;
+                                            AlertDialog dialog = builder.create();
+                                            dialog.show();
+                                        }
+
+                                    }else{
+                                        Log.d(TAG, "Error getting documents: ", task.getException());
+                                    }
+                                }
+                            });
+
+                            /*if (document.getId().equals(request.getUser_name())){//owner name match the owner, alert box
+
+                                String email = document.get("Email").toString();
+                                builder = new AlertDialog.Builder(context);
+                                builder.setMessage("Email: "+email);
+                                //Creating dialog box
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                                break;
+                            }*/
+                        }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
+                }
+            });
         }
 
         //onBackPressed();

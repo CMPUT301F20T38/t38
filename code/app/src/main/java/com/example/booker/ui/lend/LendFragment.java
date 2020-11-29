@@ -24,6 +24,8 @@ import androidx.fragment.app.Fragment;
 import com.example.booker.R;
 import com.example.booker.activities.AddOwnerBook;
 import com.example.booker.activities.EditDeleteOwnerBook;
+import com.example.booker.activities.RequestListActivity;
+import com.example.booker.activities.ScanCodeActivity;
 import com.example.booker.data.Book;
 import com.example.booker.data.OwnerListViewAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -176,7 +178,9 @@ public class LendFragment extends Fragment {
         btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent_request = new Intent(view.getContext(), ScanCodeActivity.class);
+                intent_request.putExtra("event","scan_for_desc");
+                startActivity(intent_request);
             }
         });
 
