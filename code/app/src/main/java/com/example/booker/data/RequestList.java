@@ -3,6 +3,7 @@ package com.example.booker.data;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -315,6 +316,17 @@ public class RequestList extends ArrayAdapter<Request> {
                         }
                     }
                 });
+                //show notification
+                builder = new AlertDialog.Builder(view.getContext());
+                builder.setMessage("Successfully declined")
+                        .setCancelable(false)
+                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                ((Activity) context).finish();
+                            }
+                        })  ;
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 

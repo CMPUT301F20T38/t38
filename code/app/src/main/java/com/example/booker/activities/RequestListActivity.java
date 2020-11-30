@@ -118,6 +118,10 @@ public class RequestListActivity extends AppCompatActivity {
         //returned from accepting request
         if (requestCode == 25){
             finish();
+        }else if(requestCode == 26){
+            requestAdapter = new RequestList(RequestListActivity.this, requestList);
+            request_list.setAdapter(requestAdapter);
+            requestAdapter.notifyDataSetChanged();
         }
     }
 }
