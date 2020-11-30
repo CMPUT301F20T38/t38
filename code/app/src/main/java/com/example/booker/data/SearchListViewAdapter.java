@@ -97,11 +97,12 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     Log.e("image","begin");
+                    Log.e("image",(String)bookList.get(i).get("ISBN"));
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //Log.e("imageID",document.getId());
                        if (document.getId().equals((String)bookList.get(i).get("ISBN"))) {
 
-                           Log.e("image",(String)bookList.get(i).get("ISBN"));
+                           Log.e("imagefind ISBN",(String)bookList.get(i).get("ISBN"));
                            //Log.e("image",document.getData().);
 
                            Map<String, Object> map = new HashMap<String, Object>();
@@ -110,14 +111,18 @@ public class SearchListViewAdapter extends ArrayAdapter<Map<String, Object>>{
                                Map<String, Object> map1 = new HashMap<String, Object>();
                                map1 = (Map) map.get(i);
 
-                               Log.e("imagefind",map1.get("Url").toString());
+                               Log.e("imagefind URL",map1.get("Url").toString());
 
 
                                Glide.with(finalView)
                                        .load(map1.get("Url").toString())
                                        .into(image);
                            }
+                           break;
                         }
+                        Glide.with(finalView)
+                                .load("")
+                                .into(image);
                     }
                 }
 
