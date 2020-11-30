@@ -146,7 +146,7 @@ public class RequestList extends ArrayAdapter<Request> {
                 scanIntent.putExtra("borrowerName", request.getUser_name());
                 scanIntent.putExtra("requests",requests);
                 scanIntent.putExtra("event","owner_scan");
-                context.startActivity(scanIntent);
+                ((Activity) context).startActivityForResult(scanIntent,25);
 
                 /*//the map has already added location
                 if(owner_path.collection("location").document("latLon")!=null){
