@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.bumptech.glide.Glide;
 import com.example.booker.MainActivity;
 import com.example.booker.R;
 import com.example.booker.activities.DisplayMapActivity;
@@ -33,6 +34,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -75,6 +77,8 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //find the borrower's path, check if it exists
+        View finalView = view;
+        View finalView1 = view;
         db.collection("User").document(borrowedBook.getOwner()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -83,6 +87,43 @@ public class BorrowedBooksList extends ArrayAdapter<BorrowedBooks>  {
                             Log.d(TAG,"SUccessfull find document");
                             String userName = task.getResult().get("Name").toString();
                             //the img resourse will be changed later, but now it will just use sample
+
+                            db.collection("UploadImages").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.e("image","begin");
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            //Log.e("imageID",document.getId());
+                                            if (document.getId().equals(borrowedBook.getISBN())) {
+
+                                                Log.e("image",borrowedBook.getISBN());
+                                                //Log.e("image",document.getData().);
+
+                                                Map<String, Object> map = new HashMap<String, Object>();
+                                                map = (Map) document.getData();
+                                                for(String i: map.keySet()){
+                                                    Map<String, Object> map1 = new HashMap<String, Object>();
+                                                    map1 = (Map) map.get(i);
+
+                                                    Log.e("imagefind",map1.get("Url").toString());
+
+
+                                                    Glide.with(finalView1)
+                                                            .load(map1.get("Url").toString())
+                                                            .into(borrowed_img);
+                                                }
+                                                break;
+                                            }
+                                            Glide.with(finalView)
+                                                    .load("")
+                                                    .into(borrowed_img);
+                                        }
+                                    }
+
+                                }
+                            });
+
                             borrowed_img.setImageResource(R.mipmap.testimg);
                             borrowed_title.setText(borrowedBook.getTitle());
                             borrowed_author.setText(borrowedBook.getAuthor());
