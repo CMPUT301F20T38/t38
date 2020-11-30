@@ -273,8 +273,6 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                                                         .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                                                             public void onClick(DialogInterface dialog, int id) {
                                                                 finish();
-                                                                Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
-                                                                        Toast.LENGTH_SHORT).show();
                                                             }
                                                         })  ;
                                                 AlertDialog dialog = builder.create();
