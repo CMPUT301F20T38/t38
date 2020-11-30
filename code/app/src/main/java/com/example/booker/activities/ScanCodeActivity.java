@@ -258,11 +258,11 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                             //find the correspond book
 
-                                            //Log.e("======================================",document.get("isbn").toString()+"   "+isbn);
-                                            flag_a = true;
-                                            if(document.get("isbn").toString().equals(isbn)){
-                                                //Log.e("======================================","find the book");
+                                            Log.e("======================================",document.get("isbn").toString()+"   "+isbn);
 
+                                            if(document.get("isbn").toString().equals(isbn)){
+                                                Log.e("======================================","find the book");
+                                                flag_a = true;
                                                 String status = document.get("status").toString();
                                                 String borrower = document.get("borrower").toString();
                                                 String title = document.get("title").toString();
@@ -281,8 +281,8 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
                                             }
                                         }
 
-                                        if(!flag_a){
-                                            //Log.e("======================================","not find the book");
+                                        if(flag_a==false){
+                                            Log.e("======================================","not find the book");
                                             builder = new AlertDialog.Builder(scannerView.getContext());
                                             builder.setMessage("No book match the ISBN")
                                                     .setCancelable(false)
