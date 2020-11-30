@@ -37,8 +37,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-//copy
 
+/**
+ * The scan activity is basically handle different events whenever there's an ISBN need to be scanned
+ *
+ * Part of these code are using open source  online
+ * Citing detail below:
+ * author: arjanpdl
+ * date: Feb 2, 2020
+ * Title: BarcodeandQrcodeScanner
+ * Type: source code
+ * https://github.com/Arjanpdl/BarcodeandQrcodeScanner
+ */
 
 public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler{
     boolean flag_a = false;
