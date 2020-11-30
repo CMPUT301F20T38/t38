@@ -353,6 +353,9 @@ public class ScanCodeActivity extends AppCompatActivity implements ZXingScannerV
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 23){
+            //set return intent for request list activity
+            Intent return_intent = new Intent();
+            setResult(25,return_intent);
             finish();
         }
     }

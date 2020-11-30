@@ -94,7 +94,11 @@ public class OwnerListViewAdapter extends ArrayAdapter<Book> {
                                         .load(map1.get("Url").toString())
                                         .into(image);
                             }
+                            break;
                         }
+                        Glide.with(finalView)
+                                .load("")
+                                .into(image);
                     }
                 }
 

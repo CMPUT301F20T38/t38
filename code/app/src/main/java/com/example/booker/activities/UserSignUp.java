@@ -117,6 +117,7 @@ public class UserSignUp extends AppCompatActivity {
                     HashMap<String, String> data = new HashMap<>();
 
                     CollectionReference collectionReference = db.collection("User");
+                    data.put("Email", email);
                     data.put("Name", name);
                     String Id = user.getUid();
 
