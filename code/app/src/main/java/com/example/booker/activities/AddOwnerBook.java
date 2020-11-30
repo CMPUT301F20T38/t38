@@ -80,7 +80,7 @@ public class AddOwnerBook extends AppCompatActivity {
     private EditText ISBN;
     private Button btnComfirm;
 
-    private String currentPhotoPath;
+
 
     private ImageView photo;
     private ImageView addISBN;
@@ -141,6 +141,7 @@ public class AddOwnerBook extends AppCompatActivity {
         btnComfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (filePath == null){
                     uploadInf();
                 }
@@ -492,7 +493,7 @@ public class AddOwnerBook extends AppCompatActivity {
 
             // Get the Uri of data
             filePath = data.getData();
-            
+
             try {
 
                 // Setting image on image view using Bitmap
